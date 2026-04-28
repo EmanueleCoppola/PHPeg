@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "TaskFlow",
+    "version": "2.3.1",
+    "environment": "production"
+  },
+  "database": {
+    "engine": "postgresql",
+    "host": "db.internal",
+    "port": 5432,
+    "poolSize": 16
+  },
+  "features": {
+    "authentication": true,
+    "auditLog": true,
+    "notifications": false,
+    "betaAccess": false
+  },
+  "owners": [
+    "Platform Team",
+    "Operations Team"
+  ],
+  "services": [
+    {
+      "name": "api",
+      "replicas": 3,
+      "public": true
+    },
+    {
+      "name": "worker",
+      "replicas": 2,
+      "public": false
+    }
+  ],
+  "limits": {
+    "maxUsers": 5000,
+    "retryPolicy": {
+      "maxAttempts": 5,
+      "backoffSeconds": 30
+    }
+  }
+}
