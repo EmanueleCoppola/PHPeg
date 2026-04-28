@@ -1,0 +1,10 @@
+Json = Spacing Value Spacing
+Value = Object / Array / String / Number / "true" / "false" / "null"
+Object = "{" Spacing PairList? Spacing "}"
+PairList = Pair (Spacing "," Spacing Pair)*
+Pair = String Spacing ":" Spacing Value
+Array = "[" Spacing ValueList? Spacing "]"
+ValueList = Value (Spacing "," Spacing Value)*
+String = r'"(?:[^"\\]|\\.)*"'
+Number = r'-?[0-9]+(?:\.[0-9]+)?'
+Spacing = r'[ \t\r\n]*'
