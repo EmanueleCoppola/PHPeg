@@ -34,7 +34,7 @@ jobs:
           coverage: none
 
       - name: Install dependencies
-        run: composer update phpunit/phpunit --with-all-dependencies --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
