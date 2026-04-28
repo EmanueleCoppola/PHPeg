@@ -19,7 +19,7 @@ class CleanPegGrammarLoaderTest extends TestCase
     public function testCanLoadCalculatorGrammarFromFile(): void
     {
         $grammar = (new CleanPegGrammarLoader())->fromFile(
-            __DIR__ . '/../../examples/cleanpeg-calculator/calculator.cleanpeg',
+            __DIR__ . '/CleanPegGrammarLoaderTest/calculator.cleanpeg',
             startRule: 'calc',
         );
 
