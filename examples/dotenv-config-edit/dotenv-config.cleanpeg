@@ -1,0 +1,11 @@
+
+DotEnv = Line* EOF
+Line = Comment / BlankLine / Assignment
+Comment = "#" r'[^\n]*' "\n"?
+BlankLine = "\n"
+Assignment = Key Spacing "=" Spacing Value "\n"?
+Key = r'[A-Za-z_][A-Za-z0-9_]*'
+Value = QuotedValue / RawValue
+QuotedValue = r'"([^"\\]|\\.)*"'
+RawValue = r'[^\n#]*'
+Spacing = r'[ \t]*'
