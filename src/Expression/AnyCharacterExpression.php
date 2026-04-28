@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace EmanueleCoppola\PHPPeg\Expression;
+
+use EmanueleCoppola\PHPPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPPeg\Result\MatchResult;
+
+/**
+ * Matches a single character.
+ */
+class AnyCharacterExpression extends AbstractExpression
+{
+    public function match(ParseContext $context, int $offset): ?MatchResult
+    {
+        $char = $context->input()->charAt($offset);
+        if ($char === null) {
+            $context->recordFailure($offset, $this->describe());
+
+            return null;
+        }
+
+        return new MatchResult($offset, $offset + 1);
+    }
+
+    public function describe(): string
+    {
+        return '.';
+    }
+}
