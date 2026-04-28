@@ -4,6 +4,6 @@
 
 vendor/
 .phpunit.cache/
+/examples/nginx-config-edit/nginx-new-config.conf
 
 .DS_Store
-composer.lock
