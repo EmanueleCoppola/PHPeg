@@ -1,0 +1,13 @@
+
+NginxConfig = Spacing Statement* Spacing EOF
+Statement = Spacing (Directive / Block)
+Block = Identifier Spacing Value? Spacing "{" Spacing Statement* Spacing "}"
+Directive = Identifier Spacing ValueList Spacing ";"
+ValueList = Value (Spacing Value)*
+Value = String / Number / Token
+Identifier = r'[A-Za-z_][A-Za-z0-9_\.-]*'
+Number = r'[0-9]+(?:\.[0-9]+)?'
+String = r'"[^"]*"'
+Token = r'[^\s;{}#"]+'
+Comment = r'#[^\n]*'
+Spacing = (r'[ \t\r\n]+' / Comment)*
