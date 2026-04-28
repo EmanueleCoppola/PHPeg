@@ -1,0 +1,23 @@
+# Bixby Language specification source:
+# https://bixbydevelopers.com/dev/docs/dev-guide/developers/modeling.language
+#
+# Bixby and the Bixby Language specification are the property of their respective owners.
+# This example is not affiliated with or endorsed by Bixby or its owners.
+
+Bixby           = OptSpacing DeclarationList? OptSpacing EOF
+DeclarationList = Declaration (Spacing Declaration)*
+Declaration     = Key Parameter? Tail?
+Tail            = Block / Shortcut
+Block           = OptSpacing "{" OptSpacing DeclarationList? OptSpacing "}"
+Shortcut        = OptSpacing ":" OptSpacing Value
+Parameter       = OptSpacing "(" OptSpacing Value? OptSpacing ")"
+Value           = ValuePart*
+ValuePart       = QuotedString / BalancedParens / ValueText
+BalancedParens  = "(" OptSpacing Value? OptSpacing ")"
+QuotedString    = r'"(?:\\.|[^"\\])*"'
+ValueText       = r'[^(){}"\'\\\r\n]+'
+Key             = r'[A-Za-z0-9][A-Za-z0-9_-]*'
+Comment         = r'//[^\r\n]*'
+SpacingAtom     = r'[ \t\r\n]+' / Comment
+Spacing         = SpacingAtom+
+OptSpacing      = SpacingAtom*
