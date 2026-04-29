@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 

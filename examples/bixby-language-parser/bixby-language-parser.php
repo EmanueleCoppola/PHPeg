@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
@@ -25,9 +25,9 @@ if ($source === false) {
 $document = $grammar->parseDocument($source);
 $factory = new AstNodeFactory();
 
-/** @var ?\EmanueleCoppola\PHPPeg\Ast\AstNode $workerProcesses */
+/** @var ?\EmanueleCoppola\PHPeg\Ast\AstNode $workerProcesses */
 $workerProcesses = $document->query('Directive[name="worker_processes"]')->first();
-/** @var ?\EmanueleCoppola\PHPPeg\Ast\AstNode $keepaliveTimeout */
+/** @var ?\EmanueleCoppola\PHPeg\Ast\AstNode $keepaliveTimeout */
 $keepaliveTimeout = $document->query('Directive[name="keepalive_timeout"]')->first();
 
 $workerProcessesBefore = trim($workerProcesses?->text() ?? '');
@@ -37,7 +37,7 @@ $workerProcesses?->replaceWith(
     $factory->token('Statement', statementLine($document->root(), 'worker_processes 2;'))
 );
 
-/** @var ?\EmanueleCoppola\PHPPeg\Ast\AstNode $keepaliveValue */
+/** @var ?\EmanueleCoppola\PHPeg\Ast\AstNode $keepaliveValue */
 $keepaliveValue = $document->query('Directive[name="keepalive_timeout"] Value[text="65"]')->first();
 $keepaliveValue?->replaceWith(
     $factory->token('Number', '120')
