@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Feature;
+namespace EmanueleCoppola\PHPeg\Tests\Feature;
 
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 use PHPUnit\Framework\TestCase;
 
 class CleanPegGrammarLoaderTest extends TestCase
@@ -94,7 +94,7 @@ CLEANPEG, startRule: 'start');
         self::assertTrue($grammar->parse('123')->isSuccess());
     }
 
-    private function calculator(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function calculator(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         return (new CleanPegGrammarLoader())->fromString($this->calculatorGrammar(), startRule: 'calc');
     }

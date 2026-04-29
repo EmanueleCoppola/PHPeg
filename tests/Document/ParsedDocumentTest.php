@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Document;
+namespace EmanueleCoppola\PHPeg\Tests\Document;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
 use PHPUnit\Framework\TestCase;
 
 class ParsedDocumentTest extends TestCase
@@ -35,7 +35,7 @@ class ParsedDocumentTest extends TestCase
     /**
      * Builds the Nginx document fixture.
      */
-    private function nginxDocument(): \EmanueleCoppola\PHPPeg\Document\ParsedDocument
+    private function nginxDocument(): \EmanueleCoppola\PHPeg\Document\ParsedDocument
     {
         $grammar = $this->nginxGrammar();
 
@@ -45,7 +45,7 @@ class ParsedDocumentTest extends TestCase
     /**
      * Returns the Nginx grammar used by the document test.
      */
-    private function nginxGrammar(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function nginxGrammar(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         $grammar = <<<'CLEANPEG'
 NginxConfig = Spacing Statement* Spacing EOF
@@ -62,7 +62,7 @@ Comment = r'#[^\n]*'
 Spacing = (r'[ \t\r\n]+' / Comment)*
 CLEANPEG;
 
-        return (new \EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader())->fromString($grammar, startRule: 'NginxConfig');
+        return (new \EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader())->fromString($grammar, startRule: 'NginxConfig');
     }
 
     /**

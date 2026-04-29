@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Mutation;
+namespace EmanueleCoppola\PHPeg\Mutation;
 
 /**
  * Supported AST insertion positions.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Mutation;
+namespace EmanueleCoppola\PHPeg\Tests\Mutation;
 
-use EmanueleCoppola\PHPPeg\Mutation\InsertPosition;
+use EmanueleCoppola\PHPeg\Mutation\InsertPosition;
 use PHPUnit\Framework\TestCase;
 
 class InsertPositionTest extends TestCase

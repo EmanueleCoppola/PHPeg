@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Parser;
+namespace EmanueleCoppola\PHPeg\Parser;
 
 /**
  * Provides read-only input access and position calculations.

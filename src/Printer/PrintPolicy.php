@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Printer;
+namespace EmanueleCoppola\PHPeg\Printer;
 
 /**
  * Formatting policy used when rendering inserted or replaced nodes.

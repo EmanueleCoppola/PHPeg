@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Parser;
+namespace EmanueleCoppola\PHPeg\Parser;
 
-use EmanueleCoppola\PHPPeg\Error\ParseError;
-use EmanueleCoppola\PHPPeg\Error\LeftRecursionException;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Error\ParseError;
+use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
  * Holds parser state, memoization, and failure diagnostics.

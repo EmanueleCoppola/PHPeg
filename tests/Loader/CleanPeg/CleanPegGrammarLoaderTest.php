@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Tests\Loader\CleanPeg;
 
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 use PHPUnit\Framework\TestCase;
 
 class CleanPegGrammarLoaderTest extends TestCase

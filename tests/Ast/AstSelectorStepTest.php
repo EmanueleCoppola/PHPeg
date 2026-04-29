@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Ast;
+namespace EmanueleCoppola\PHPeg\Tests\Ast;
 
-use EmanueleCoppola\PHPPeg\Ast\AstSelectorStep;
+use EmanueleCoppola\PHPeg\Ast\AstSelectorStep;
 use PHPUnit\Framework\TestCase;
 
 class AstSelectorStepTest extends TestCase

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Feature;
+namespace EmanueleCoppola\PHPeg\Tests\Feature;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
-use EmanueleCoppola\PHPPeg\Loader\Peg\PegGrammarLoader;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Loader\Peg\PegGrammarLoader;
 use PHPUnit\Framework\TestCase;
 
 class RecursiveGrammarTest extends TestCase

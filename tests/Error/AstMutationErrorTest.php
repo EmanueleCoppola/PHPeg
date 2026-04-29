@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Error;
+namespace EmanueleCoppola\PHPeg\Tests\Error;
 
-use EmanueleCoppola\PHPPeg\Error\AstMutationError;
+use EmanueleCoppola\PHPeg\Error\AstMutationError;
 use PHPUnit\Framework\TestCase;
 
 class AstMutationErrorTest extends TestCase

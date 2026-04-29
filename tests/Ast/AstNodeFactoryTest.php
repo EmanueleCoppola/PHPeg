@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Ast;
+namespace EmanueleCoppola\PHPeg\Tests\Ast;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
 use PHPUnit\Framework\TestCase;
 
 class AstNodeFactoryTest extends TestCase

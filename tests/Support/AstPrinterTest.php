@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Support;
+namespace EmanueleCoppola\PHPeg\Tests\Support;
 
-use EmanueleCoppola\PHPPeg\Support\AstPrinter;
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Support\AstPrinter;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
 use PHPUnit\Framework\TestCase;
 
 class AstPrinterTest extends TestCase

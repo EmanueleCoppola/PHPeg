@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Feature;
+namespace EmanueleCoppola\PHPeg\Tests\Feature;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
-use EmanueleCoppola\PHPPeg\Error\AstQueryError;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Error\AstQueryError;
 use PHPUnit\Framework\TestCase;
 
 class AstQueryTest extends TestCase

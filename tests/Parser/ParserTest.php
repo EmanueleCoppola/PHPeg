@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Parser;
+namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
 use PHPUnit\Framework\TestCase;
 
 class ParserTest extends TestCase
@@ -37,7 +37,7 @@ class ParserTest extends TestCase
     /**
      * Builds a grammar that accepts a single `a`.
      */
-    private function simpleGrammar(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function simpleGrammar(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         $builder = GrammarBuilder::create();
 
@@ -50,7 +50,7 @@ class ParserTest extends TestCase
     /**
      * Builds a grammar that triggers direct left recursion.
      */
-    private function leftRecursiveGrammar(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function leftRecursiveGrammar(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         $builder = GrammarBuilder::create();
 

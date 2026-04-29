@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Ast;
+namespace EmanueleCoppola\PHPeg\Ast;
 
-use EmanueleCoppola\PHPPeg\Error\AstQueryError;
+use EmanueleCoppola\PHPeg\Error\AstQueryError;
 
 /**
  * Parses a small CSS-like selector language for AST nodes.

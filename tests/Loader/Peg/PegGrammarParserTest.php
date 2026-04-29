@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Tests\Loader\Peg;
 
-use EmanueleCoppola\PHPPeg\Loader\Peg\PegGrammarParser;
+use EmanueleCoppola\PHPeg\Loader\Peg\PegGrammarParser;
 use PHPUnit\Framework\TestCase;
 
 class PegGrammarParserTest extends TestCase

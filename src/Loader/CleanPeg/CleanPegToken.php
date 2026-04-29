@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Loader\CleanPeg;
 
 /**
  * Represents a token in CleanPeg grammar source.

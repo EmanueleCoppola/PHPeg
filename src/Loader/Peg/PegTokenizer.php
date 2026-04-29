@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Loader\Peg;
 
 use InvalidArgumentException;
 

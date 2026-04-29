@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Loader\CleanPeg;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Error\GrammarSyntaxError;
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Error\GrammarSyntaxError;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
 
 /**
  * Parses CleanPeg grammar syntax into PHPPeg grammar objects.

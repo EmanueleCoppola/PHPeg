@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Grammar;
+namespace EmanueleCoppola\PHPeg\Tests\Grammar;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
 use PHPUnit\Framework\TestCase;
 
 class GrammarTest extends TestCase

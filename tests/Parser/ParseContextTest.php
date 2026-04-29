@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Parser;
+namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Error\LeftRecursionException;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
 use PHPUnit\Framework\TestCase;
 
 class ParseContextTest extends TestCase

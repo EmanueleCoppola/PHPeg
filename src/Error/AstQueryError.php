@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Error;
+namespace EmanueleCoppola\PHPeg\Error;
 
 use InvalidArgumentException;
 

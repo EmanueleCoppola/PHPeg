@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Result;
+namespace EmanueleCoppola\PHPeg\Tests\Result;
 
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 use PHPUnit\Framework\TestCase;
 
 class MatchResultTest extends TestCase

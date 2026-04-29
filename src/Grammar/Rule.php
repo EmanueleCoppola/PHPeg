@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Grammar;
+namespace EmanueleCoppola\PHPeg\Grammar;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Parser\ParseContext;
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
  * Represents a named grammar rule.

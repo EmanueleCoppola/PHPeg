@@ -16,13 +16,13 @@
   ],
   "autoload": {
     "psr-4": {
-      "EmanueleCoppola\\PHPPeg\\": "src/"
+      "EmanueleCoppola\\PHPeg\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
       "EmanueleCoppola\\PHPeg\\App\\": "app/",
-      "EmanueleCoppola\\PHPPeg\\Tests\\": "tests/"
+      "EmanueleCoppola\\PHPeg\\Tests\\": "tests/"
     }
   },
   "scripts": {

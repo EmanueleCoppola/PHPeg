@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Error;
+namespace EmanueleCoppola\PHPeg\Tests\Error;
 
-use EmanueleCoppola\PHPPeg\Error\GrammarSyntaxError;
+use EmanueleCoppola\PHPeg\Error\GrammarSyntaxError;
 use PHPUnit\Framework\TestCase;
 
 class GrammarSyntaxErrorTest extends TestCase

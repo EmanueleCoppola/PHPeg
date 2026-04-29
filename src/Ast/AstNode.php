@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Ast;
+namespace EmanueleCoppola\PHPeg\Ast;
 
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
-use EmanueleCoppola\PHPPeg\Error\AstMutationError;
-use EmanueleCoppola\PHPPeg\Mutation\InsertPosition;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Error\AstMutationError;
+use EmanueleCoppola\PHPeg\Mutation\InsertPosition;
 
 /**
  * Mutable source-aware AST node used for querying and source-preserving edits.

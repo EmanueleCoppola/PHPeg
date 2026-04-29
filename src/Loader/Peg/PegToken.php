@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Loader\Peg;
 
 /**
  * Represents a token emitted while lexing PEG grammar text.

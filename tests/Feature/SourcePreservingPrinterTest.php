@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Feature;
+namespace EmanueleCoppola\PHPeg\Tests\Feature;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
 use PHPUnit\Framework\TestCase;
 
 class SourcePreservingPrinterTest extends TestCase
@@ -78,7 +78,7 @@ class SourcePreservingPrinterTest extends TestCase
         return $this->nginxGrammar()->parseDocument($this->nginxSource());
     }
 
-    private function nginxGrammar(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function nginxGrammar(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         $g = GrammarBuilder::create();
 

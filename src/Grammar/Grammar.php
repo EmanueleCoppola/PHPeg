@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Grammar;
+namespace EmanueleCoppola\PHPeg\Grammar;
 
 use RuntimeException;
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Parser\ParseContext;
-use EmanueleCoppola\PHPPeg\Parser\InputBuffer;
-use EmanueleCoppola\PHPPeg\Parser\Parser;
-use EmanueleCoppola\PHPPeg\Result\ParseResult;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Parser\InputBuffer;
+use EmanueleCoppola\PHPeg\Parser\Parser;
+use EmanueleCoppola\PHPeg\Result\ParseResult;
 
 /**
  * Immutable PEG grammar container.

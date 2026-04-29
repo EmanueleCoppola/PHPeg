@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Printer;
+namespace EmanueleCoppola\PHPeg\Tests\Printer;
 
-use EmanueleCoppola\PHPPeg\Printer\PrintPolicy;
+use EmanueleCoppola\PHPeg\Printer\PrintPolicy;
 use PHPUnit\Framework\TestCase;
 
 class PrintPolicyTest extends TestCase

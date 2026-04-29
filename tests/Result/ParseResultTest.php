@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Result;
+namespace EmanueleCoppola\PHPeg\Tests\Result;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
-use EmanueleCoppola\PHPPeg\Error\ParseError;
-use EmanueleCoppola\PHPPeg\Result\ParseResult;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Error\ParseError;
+use EmanueleCoppola\PHPeg\Result\ParseResult;
 use PHPUnit\Framework\TestCase;
 
 class ParseResultTest extends TestCase

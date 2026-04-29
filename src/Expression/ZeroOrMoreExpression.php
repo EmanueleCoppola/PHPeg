@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Expression;
+namespace EmanueleCoppola\PHPeg\Expression;
 
-use EmanueleCoppola\PHPPeg\Parser\ParseContext;
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
  * Matches zero or more repetitions of an expression.

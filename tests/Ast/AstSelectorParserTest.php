@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Ast;
+namespace EmanueleCoppola\PHPeg\Tests\Ast;
 
-use EmanueleCoppola\PHPPeg\Ast\AstSelectorParser;
-use EmanueleCoppola\PHPPeg\Error\AstQueryError;
+use EmanueleCoppola\PHPeg\Ast\AstSelectorParser;
+use EmanueleCoppola\PHPeg\Error\AstQueryError;
 use PHPUnit\Framework\TestCase;
 
 class AstSelectorParserTest extends TestCase

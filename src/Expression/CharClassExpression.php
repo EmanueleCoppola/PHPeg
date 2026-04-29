@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Expression;
+namespace EmanueleCoppola\PHPeg\Expression;
 
 use InvalidArgumentException;
-use EmanueleCoppola\PHPPeg\Parser\ParseContext;
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
  * Matches a single character using a PEG character class.

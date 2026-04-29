@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Loader\CleanPeg;
 
-use EmanueleCoppola\PHPPeg\Error\GrammarSyntaxError;
+use EmanueleCoppola\PHPeg\Error\GrammarSyntaxError;
 
 /**
  * Tokenizes CleanPeg grammar source text.

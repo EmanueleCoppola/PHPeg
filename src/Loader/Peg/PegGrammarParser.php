@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Loader\Peg;
 
 use InvalidArgumentException;
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
 
 /**
  * Parses classic PEG grammar syntax into PHPPeg grammar objects.

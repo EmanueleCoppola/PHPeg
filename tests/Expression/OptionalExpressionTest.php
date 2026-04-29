@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Expression;
+namespace EmanueleCoppola\PHPeg\Tests\Expression;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Expression\OptionalExpression;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Expression\OptionalExpression;
 use PHPUnit\Framework\TestCase;
 
 class OptionalExpressionTest extends TestCase

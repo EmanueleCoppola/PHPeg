@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Result;
+namespace EmanueleCoppola\PHPeg\Result;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Error\ParseError;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Error\ParseError;
 
 /**
  * Public parse result object exposed to consumers.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Printer;
+namespace EmanueleCoppola\PHPeg\Tests\Printer;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNodeFactory;
+use EmanueleCoppola\PHPeg\Ast\AstNodeFactory;
 use PHPUnit\Framework\TestCase;
 
 class SourcePreservingPrinterTest extends TestCase
@@ -36,7 +36,7 @@ class SourcePreservingPrinterTest extends TestCase
     /**
      * Builds the Nginx document fixture for printer assertions.
      */
-    private function nginxDocument(): \EmanueleCoppola\PHPPeg\Document\ParsedDocument
+    private function nginxDocument(): \EmanueleCoppola\PHPeg\Document\ParsedDocument
     {
         $grammar = $this->nginxGrammar();
 
@@ -46,7 +46,7 @@ class SourcePreservingPrinterTest extends TestCase
     /**
      * Returns the Nginx grammar used by the printer test.
      */
-    private function nginxGrammar(): \EmanueleCoppola\PHPPeg\Grammar\Grammar
+    private function nginxGrammar(): \EmanueleCoppola\PHPeg\Grammar\Grammar
     {
         $grammar = <<<'CLEANPEG'
 NginxConfig = Spacing Statement* Spacing EOF
@@ -63,7 +63,7 @@ Comment = r'#[^\n]*'
 Spacing = (r'[ \t\r\n]+' / Comment)*
 CLEANPEG;
 
-        return (new \EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegGrammarLoader())->fromString($grammar, startRule: 'NginxConfig');
+        return (new \EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader())->fromString($grammar, startRule: 'NginxConfig');
     }
 
     /**

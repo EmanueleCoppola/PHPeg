@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Expression;
+namespace EmanueleCoppola\PHPeg\Expression;
 
 /**
  * Shared base class for PEG expressions.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Expression;
+namespace EmanueleCoppola\PHPeg\Tests\Expression;
 
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Expression\LiteralExpression;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Expression\LiteralExpression;
 use PHPUnit\Framework\TestCase;
 
 class ExpressionInterfaceTest extends TestCase

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Loader\CleanPeg;
 
 use InvalidArgumentException;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
 
 /**
  * Loads grammars written in CleanPeg syntax.

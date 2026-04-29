@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Unit;
+namespace EmanueleCoppola\PHPeg\Tests\Unit;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
 use PHPUnit\Framework\TestCase;
 
 class EndOfInputExpressionTest extends TestCase

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Tests\Loader\CleanPeg;
 
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegTokenizer;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegTokenizer;
 use PHPUnit\Framework\TestCase;
 
 class CleanPegTokenizerTest extends TestCase

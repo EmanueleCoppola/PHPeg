@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Loader\CleanPeg;
+namespace EmanueleCoppola\PHPeg\Tests\Loader\CleanPeg;
 
-use EmanueleCoppola\PHPPeg\Loader\CleanPeg\CleanPegToken;
+use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegToken;
 use PHPUnit\Framework\TestCase;
 
 class CleanPegTokenTest extends TestCase

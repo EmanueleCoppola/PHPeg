@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Error;
+namespace EmanueleCoppola\PHPeg\Tests\Error;
 
-use EmanueleCoppola\PHPPeg\Error\LeftRecursionException;
+use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
 use PHPUnit\Framework\TestCase;
 
 class LeftRecursionExceptionTest extends TestCase

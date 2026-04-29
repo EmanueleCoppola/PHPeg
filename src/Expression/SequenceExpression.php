@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Expression;
+namespace EmanueleCoppola\PHPeg\Expression;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Parser\ParseContext;
-use EmanueleCoppola\PHPPeg\Result\MatchResult;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
  * Matches a sequence of expressions in order.

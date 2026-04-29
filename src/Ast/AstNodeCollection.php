@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Ast;
+namespace EmanueleCoppola\PHPeg\Ast;
 
-use EmanueleCoppola\PHPPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Document\ParsedDocument;
 
 /**
  * Represents query results over AST nodes.

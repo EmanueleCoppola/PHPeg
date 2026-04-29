@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Printer;
+namespace EmanueleCoppola\PHPeg\Printer;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Error\PrintError;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Error\PrintError;
 
 /**
  * Prints ASTs while preserving original source slices for unchanged nodes.

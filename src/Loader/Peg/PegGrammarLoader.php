@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Loader\Peg;
 
 use InvalidArgumentException;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
 
 /**
  * Loads PEG grammars from strings or files.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Expression;
+namespace EmanueleCoppola\PHPeg\Tests\Expression;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Expression\AndPredicateExpression;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Expression\AndPredicateExpression;
 use PHPUnit\Framework\TestCase;
 
 class AndPredicateExpressionTest extends TestCase

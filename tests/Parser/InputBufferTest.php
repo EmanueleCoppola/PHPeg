@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Parser;
+namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
-use EmanueleCoppola\PHPPeg\Parser\InputBuffer;
+use EmanueleCoppola\PHPeg\Parser\InputBuffer;
 use PHPUnit\Framework\TestCase;
 
 class InputBufferTest extends TestCase

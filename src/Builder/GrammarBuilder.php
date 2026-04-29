@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Builder;
+namespace EmanueleCoppola\PHPeg\Builder;
 
 use InvalidArgumentException;
-use EmanueleCoppola\PHPPeg\Expression\AndPredicateExpression;
-use EmanueleCoppola\PHPPeg\Expression\AnyCharacterExpression;
-use EmanueleCoppola\PHPPeg\Expression\CharClassExpression;
-use EmanueleCoppola\PHPPeg\Expression\ChoiceExpression;
-use EmanueleCoppola\PHPPeg\Expression\EndOfInputExpression;
-use EmanueleCoppola\PHPPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPPeg\Expression\LiteralExpression;
-use EmanueleCoppola\PHPPeg\Expression\NotPredicateExpression;
-use EmanueleCoppola\PHPPeg\Expression\OneOrMoreExpression;
-use EmanueleCoppola\PHPPeg\Expression\OptionalExpression;
-use EmanueleCoppola\PHPPeg\Expression\RegexExpression;
-use EmanueleCoppola\PHPPeg\Expression\RuleReferenceExpression;
-use EmanueleCoppola\PHPPeg\Expression\SequenceExpression;
-use EmanueleCoppola\PHPPeg\Expression\ZeroOrMoreExpression;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
-use EmanueleCoppola\PHPPeg\Grammar\Rule;
+use EmanueleCoppola\PHPeg\Expression\AndPredicateExpression;
+use EmanueleCoppola\PHPeg\Expression\AnyCharacterExpression;
+use EmanueleCoppola\PHPeg\Expression\CharClassExpression;
+use EmanueleCoppola\PHPeg\Expression\ChoiceExpression;
+use EmanueleCoppola\PHPeg\Expression\EndOfInputExpression;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Expression\LiteralExpression;
+use EmanueleCoppola\PHPeg\Expression\NotPredicateExpression;
+use EmanueleCoppola\PHPeg\Expression\OneOrMoreExpression;
+use EmanueleCoppola\PHPeg\Expression\OptionalExpression;
+use EmanueleCoppola\PHPeg\Expression\RegexExpression;
+use EmanueleCoppola\PHPeg\Expression\RuleReferenceExpression;
+use EmanueleCoppola\PHPeg\Expression\SequenceExpression;
+use EmanueleCoppola\PHPeg\Expression\ZeroOrMoreExpression;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Grammar\Rule;
 
 /**
  * Fluent grammar builder for declarative PHP grammar definitions.

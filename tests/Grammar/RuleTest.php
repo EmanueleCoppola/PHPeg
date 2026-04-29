@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Grammar;
+namespace EmanueleCoppola\PHPeg\Tests\Grammar;
 
-use EmanueleCoppola\PHPPeg\Builder\GrammarBuilder;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
-use EmanueleCoppola\PHPPeg\Grammar\Rule;
-use EmanueleCoppola\PHPPeg\Expression\LiteralExpression;
+use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Grammar\Rule;
+use EmanueleCoppola\PHPeg\Expression\LiteralExpression;
 use PHPUnit\Framework\TestCase;
 
 class RuleTest extends TestCase

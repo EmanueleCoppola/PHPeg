@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Error;
+namespace EmanueleCoppola\PHPeg\Tests\Error;
 
-use EmanueleCoppola\PHPPeg\Error\ParseError;
+use EmanueleCoppola\PHPeg\Error\ParseError;
 use PHPUnit\Framework\TestCase;
 
 class ParseErrorTest extends TestCase

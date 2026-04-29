@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Document;
+namespace EmanueleCoppola\PHPeg\Document;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
-use EmanueleCoppola\PHPPeg\Ast\AstNodeCollection;
-use EmanueleCoppola\PHPPeg\Ast\AstSelectorParser;
-use EmanueleCoppola\PHPPeg\Ast\AstSelectorStep;
-use EmanueleCoppola\PHPPeg\Grammar\Grammar;
-use EmanueleCoppola\PHPPeg\Printer\PrintPolicy;
-use EmanueleCoppola\PHPPeg\Printer\SourcePreservingPrinter;
-use EmanueleCoppola\PHPPeg\Result\ParseResult;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Ast\AstNodeCollection;
+use EmanueleCoppola\PHPeg\Ast\AstSelectorParser;
+use EmanueleCoppola\PHPeg\Ast\AstSelectorStep;
+use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Printer\PrintPolicy;
+use EmanueleCoppola\PHPeg\Printer\SourcePreservingPrinter;
+use EmanueleCoppola\PHPeg\Result\ParseResult;
 
 /**
  * Editable parsed document rooted at a source-aware AST.

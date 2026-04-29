@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Tests\Loader\Peg;
+namespace EmanueleCoppola\PHPeg\Tests\Loader\Peg;
 
-use EmanueleCoppola\PHPPeg\Loader\Peg\PegToken;
+use EmanueleCoppola\PHPeg\Loader\Peg\PegToken;
 use PHPUnit\Framework\TestCase;
 
 class PegTokenTest extends TestCase

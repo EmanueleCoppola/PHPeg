@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Result;
+namespace EmanueleCoppola\PHPeg\Result;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
 
 /**
  * Internal immutable expression match result.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Error;
+namespace EmanueleCoppola\PHPeg\Error;
 
 /**
  * Represents a parse failure with source position information.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPPeg\Support;
+namespace EmanueleCoppola\PHPeg\Support;
 
-use EmanueleCoppola\PHPPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Ast\AstNode;
 
 /**
  * Builds a readable tree representation for AST nodes.
