@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
 use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
+use EmanueleCoppola\PHPeg\Parser\ParserOptions;
 use PHPUnit\Framework\TestCase;
 
 class ParserTest extends TestCase
@@ -32,6 +33,24 @@ class ParserTest extends TestCase
 
         self::assertFalse($result->isSuccess());
         self::assertStringContainsString('Left-recursive rule detected', $result->error()?->message() ?? '');
+    }
+
+    /**
+     * Verifies optimized error tracking remains opt-in.
+     */
+    public function testSupportsOptimizedErrorTrackingAsAnOption(): void
+    {
+        $builder = GrammarBuilder::create();
+        $grammar = $builder
+            ->grammar('Start')
+            ->rule('Start', $builder->choice($builder->literal('a'), $builder->literal('b')))
+            ->build();
+
+        $detailed = $grammar->parse('c');
+        $optimized = $grammar->parse('c', options: new ParserOptions(optimizeErrors: true));
+
+        self::assertSame(['"a"', '"b"'], $detailed->error()?->expected());
+        self::assertCount(1, $optimized->error()?->expected() ?? []);
     }
 
     /**
