@@ -16,11 +16,10 @@ class ParserOptions
      */
     public function __construct(
         private readonly bool $memoizationEnabled = true,
-        private readonly bool $memoryOptimized = false,
-        private readonly bool $fastMode = false,
         private readonly ?int $maxCacheEntries = null,
         private readonly bool $optimizeErrors = false,
         private readonly bool $reuseEmptyMatches = false,
+        private readonly bool $lazyNodeText = true,
     ) {
         if ($maxCacheEntries !== null && $maxCacheEntries < 0) {
             throw new RuntimeException('maxCacheEntries must be greater than or equal to zero.');
@@ -28,41 +27,11 @@ class ParserOptions
     }
 
     /**
-     * Returns the default compatibility-focused parser options.
+     * Returns the default parser options.
      */
     public static function defaults(): self
     {
         return new self();
-    }
-
-    /**
-     * Returns a speed-oriented parser option preset.
-     */
-    public static function fast(): self
-    {
-        return new self(
-            memoizationEnabled: true,
-            memoryOptimized: false,
-            fastMode: true,
-            maxCacheEntries: null,
-            optimizeErrors: true,
-            reuseEmptyMatches: true,
-        );
-    }
-
-    /**
-     * Returns a memory-oriented parser option preset.
-     */
-    public static function memoryOptimized(): self
-    {
-        return new self(
-            memoizationEnabled: false,
-            memoryOptimized: true,
-            fastMode: false,
-            maxCacheEntries: 0,
-            optimizeErrors: false,
-            reuseEmptyMatches: false,
-        );
     }
 
     /**
@@ -71,22 +40,6 @@ class ParserOptions
     public function memoizationEnabled(): bool
     {
         return $this->memoizationEnabled;
-    }
-
-    /**
-     * Returns whether the memory-optimized preset is active.
-     */
-    public function memoryOptimizedEnabled(): bool
-    {
-        return $this->memoryOptimized;
-    }
-
-    /**
-     * Returns whether the speed-oriented preset is active.
-     */
-    public function fastModeEnabled(): bool
-    {
-        return $this->fastMode;
     }
 
     /**
@@ -114,47 +67,24 @@ class ParserOptions
     }
 
     /**
+     * Returns whether original AST node text is loaded lazily from the input buffer.
+     */
+    public function lazyNodeText(): bool
+    {
+        return $this->lazyNodeText;
+    }
+
+    /**
      * Returns a copy with memoization toggled.
      */
     public function withMemoization(bool $enabled): self
     {
         return new self(
             memoizationEnabled: $enabled,
-            memoryOptimized: $this->memoryOptimized,
-            fastMode: $this->fastMode,
             maxCacheEntries: $this->maxCacheEntries,
             optimizeErrors: $this->optimizeErrors,
             reuseEmptyMatches: $this->reuseEmptyMatches,
-        );
-    }
-
-    /**
-     * Returns a copy with the memory-oriented mode toggled.
-     */
-    public function withMemoryOptimized(bool $enabled): self
-    {
-        return new self(
-            memoizationEnabled: $this->memoizationEnabled,
-            memoryOptimized: $enabled,
-            fastMode: $this->fastMode,
-            maxCacheEntries: $this->maxCacheEntries,
-            optimizeErrors: $this->optimizeErrors,
-            reuseEmptyMatches: $this->reuseEmptyMatches,
-        );
-    }
-
-    /**
-     * Returns a copy with the speed-oriented mode toggled.
-     */
-    public function withFastMode(bool $enabled): self
-    {
-        return new self(
-            memoizationEnabled: $this->memoizationEnabled,
-            memoryOptimized: $this->memoryOptimized,
-            fastMode: $enabled,
-            maxCacheEntries: $this->maxCacheEntries,
-            optimizeErrors: $this->optimizeErrors,
-            reuseEmptyMatches: $this->reuseEmptyMatches,
+            lazyNodeText: $this->lazyNodeText,
         );
     }
 
@@ -165,11 +95,10 @@ class ParserOptions
     {
         return new self(
             memoizationEnabled: $this->memoizationEnabled,
-            memoryOptimized: $this->memoryOptimized,
-            fastMode: $this->fastMode,
             maxCacheEntries: $maxCacheEntries,
             optimizeErrors: $this->optimizeErrors,
             reuseEmptyMatches: $this->reuseEmptyMatches,
+            lazyNodeText: $this->lazyNodeText,
         );
     }
 
@@ -180,11 +109,10 @@ class ParserOptions
     {
         return new self(
             memoizationEnabled: $this->memoizationEnabled,
-            memoryOptimized: $this->memoryOptimized,
-            fastMode: $this->fastMode,
             maxCacheEntries: $this->maxCacheEntries,
             optimizeErrors: $enabled,
             reuseEmptyMatches: $this->reuseEmptyMatches,
+            lazyNodeText: $this->lazyNodeText,
         );
     }
 
@@ -195,11 +123,24 @@ class ParserOptions
     {
         return new self(
             memoizationEnabled: $this->memoizationEnabled,
-            memoryOptimized: $this->memoryOptimized,
-            fastMode: $this->fastMode,
             maxCacheEntries: $this->maxCacheEntries,
             optimizeErrors: $this->optimizeErrors,
             reuseEmptyMatches: $enabled,
+            lazyNodeText: $this->lazyNodeText,
+        );
+    }
+
+    /**
+     * Returns a copy with lazy original node text toggled.
+     */
+    public function withLazyNodeText(bool $enabled): self
+    {
+        return new self(
+            memoizationEnabled: $this->memoizationEnabled,
+            maxCacheEntries: $this->maxCacheEntries,
+            optimizeErrors: $this->optimizeErrors,
+            reuseEmptyMatches: $this->reuseEmptyMatches,
+            lazyNodeText: $enabled,
         );
     }
 
@@ -212,11 +153,10 @@ class ParserOptions
     {
         return [
             'memoization' => $this->memoizationEnabled,
-            'memoryOptimized' => $this->memoryOptimized,
-            'fastMode' => $this->fastMode,
             'maxCacheEntries' => $this->maxCacheEntries,
             'optimizeErrors' => $this->optimizeErrors,
             'reuseEmptyMatches' => $this->reuseEmptyMatches,
+            'lazyNodeText' => $this->lazyNodeText,
         ];
     }
 }

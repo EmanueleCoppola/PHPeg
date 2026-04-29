@@ -7,6 +7,7 @@ namespace EmanueleCoppola\PHPeg\Ast;
 use EmanueleCoppola\PHPeg\Document\ParsedDocument;
 use EmanueleCoppola\PHPeg\Error\AstMutationError;
 use EmanueleCoppola\PHPeg\Mutation\InsertPosition;
+use EmanueleCoppola\PHPeg\Parser\InputBuffer;
 
 /**
  * Mutable source-aware AST node used for querying and source-preserving edits.
@@ -22,6 +23,8 @@ class AstNode
      * @var list<AstNode>
      */
     private array $originalChildren;
+
+    private bool $originalStructureMirrorsChildren = false;
 
     /**
      * @var array<int, AstNode|null>
@@ -43,9 +46,11 @@ class AstNode
 
     private bool $removed = false;
 
-    private string $originalText;
+    private ?string $originalText;
 
     private ?string $renderText;
+
+    private ?InputBuffer $sourceBuffer;
 
     /**
      * @var array<int, list<AstNode>>
@@ -70,11 +75,9 @@ class AstNode
         }
 
         $this->children = $clonedChildren;
-        $this->originalChildren = $clonedChildren;
+        $this->originalChildren = [];
+        $this->originalStructureMirrorsChildren = false;
         $this->slotNodes = [];
-        foreach ($clonedChildren as $index => $child) {
-            $this->slotNodes[$index] = $child;
-        }
         $this->insertBefore = [];
         $this->insertAfter = [];
         $this->inserted = true;
@@ -87,27 +90,26 @@ class AstNode
      */
     public function __construct(
         private readonly string $name,
-        string $text,
+        ?string $text,
         private readonly int $startOffset,
         private readonly int $endOffset,
         array $children = [],
         array $attributes = [],
         bool $isOriginal = true,
         ?string $renderText = null,
+        ?InputBuffer $sourceBuffer = null,
     ) {
         $this->children = array_values($children);
-        $this->originalChildren = array_values($children);
+        $this->originalChildren = [];
+        $this->originalStructureMirrorsChildren = $isOriginal;
         $this->attributes = $attributes;
         $this->originalText = $text;
+        $this->sourceBuffer = $sourceBuffer;
         $this->renderText = $renderText ?? (!$isOriginal ? $text : null);
         $this->inserted = !$isOriginal;
 
         foreach ($this->children as $child) {
             $child->parent = $this;
-        }
-
-        foreach ($this->originalChildren as $index => $child) {
-            $this->slotNodes[$index] = $child;
         }
     }
 
@@ -128,7 +130,7 @@ class AstNode
             return $this->renderText;
         }
 
-        return $this->originalText;
+        return $this->materializedOriginalText();
     }
 
     /**
@@ -329,11 +331,13 @@ class AstNode
             return false;
         }
 
-        if ($this->children !== [] || $this->originalChildren !== []) {
+        if ($this->children !== [] || $this->currentOriginalChildren() !== []) {
             return true;
         }
 
-        return str_contains($this->originalText, '{') && str_contains($this->originalText, '}');
+        $text = $this->materializedOriginalText();
+
+        return str_contains($text, '{') && str_contains($text, '}');
     }
 
     /**
@@ -354,7 +358,7 @@ class AstNode
      */
     public function originalText(): string
     {
-        return $this->originalText;
+        return $this->materializedOriginalText();
     }
 
     /**
@@ -362,7 +366,7 @@ class AstNode
      */
     public function originalChildren(): array
     {
-        return $this->originalChildren;
+        return $this->currentOriginalChildren();
     }
 
     /**
@@ -370,7 +374,7 @@ class AstNode
      */
     public function slotNodes(): array
     {
-        return $this->slotNodes;
+        return $this->currentSlotNodes();
     }
 
     /**
@@ -435,6 +439,9 @@ class AstNode
             throw new AstMutationError(sprintf('Cannot insert children into leaf node "%s".', $this->name));
         }
 
+        $this->ensureOriginalStructureTracking();
+        $originalChildren = $this->currentOriginalChildren();
+
         $node->inserted = true;
         $node->parent = $this;
         if ($this->document !== null) {
@@ -447,14 +454,14 @@ class AstNode
             default => $this->children,
         };
 
-        if ($this->originalChildren === []) {
+        if ($originalChildren === []) {
             $this->insertAfter[-1] ??= [];
             $this->insertAfter[-1][] = $node;
         } elseif ($position === InsertPosition::Prepend) {
             $this->insertBefore[0] ??= [];
             $this->insertBefore[0][] = $node;
         } else {
-            $lastSlot = count($this->originalChildren) - 1;
+            $lastSlot = count($originalChildren) - 1;
             $this->insertAfter[$lastSlot] ??= [];
             $this->insertAfter[$lastSlot][] = $node;
         }
@@ -466,6 +473,7 @@ class AstNode
 
     private function insertRelativeToChild(AstNode $target, AstNode $node, InsertPosition $position): void
     {
+        $this->ensureOriginalStructureTracking();
         $index = $this->findChildIndex($target);
 
         $node->inserted = true;
@@ -494,6 +502,7 @@ class AstNode
 
     private function replaceChild(AstNode $target, AstNode $replacement): void
     {
+        $this->ensureOriginalStructureTracking();
         $index = $this->findChildIndex($target);
         $slotIndex = $this->findOriginalChildIndex($target);
 
@@ -516,6 +525,7 @@ class AstNode
 
     private function removeChild(AstNode $target): void
     {
+        $this->ensureOriginalStructureTracking();
         $index = $this->findChildIndex($target);
         array_splice($this->children, $index, 1);
         $target->removed = true;
@@ -539,7 +549,7 @@ class AstNode
 
     private function findOriginalChildIndex(AstNode $target): ?int
     {
-        foreach ($this->originalChildren as $index => $child) {
+        foreach ($this->currentOriginalChildren() as $index => $child) {
             if ($child === $target) {
                 return $index;
             }
@@ -576,10 +586,79 @@ class AstNode
         foreach (['Value', 'String', 'Number', 'Literal', 'Path', 'Url', 'ValueList'] as $childName) {
             $child = $this->firstChild($childName);
             if ($child !== null) {
-                return trim($child->text(), "\"' \t\r\n");
+        return trim($child->text(), "\"' \t\r\n");
             }
         }
 
         return null;
+    }
+
+    /**
+     * Returns the original child snapshot for source-preserving operations.
+     *
+     * @return list<AstNode>
+     */
+    private function currentOriginalChildren(): array
+    {
+        if ($this->originalStructureMirrorsChildren) {
+            return $this->children;
+        }
+
+        return $this->originalChildren;
+    }
+
+    /**
+     * Returns the current slot map without forcing source-preserving setup.
+     *
+     * @return array<int, AstNode|null>
+     */
+    private function currentSlotNodes(): array
+    {
+        if (!$this->originalStructureMirrorsChildren) {
+            return $this->slotNodes;
+        }
+
+        $slotNodes = [];
+        foreach ($this->children as $index => $child) {
+            $slotNodes[$index] = $child;
+        }
+
+        return $slotNodes;
+    }
+
+    /**
+     * Captures the original child layout before the node is mutated.
+     */
+    private function ensureOriginalStructureTracking(): void
+    {
+        if (!$this->originalStructureMirrorsChildren) {
+            return;
+        }
+
+        $this->originalChildren = $this->children;
+        $this->slotNodes = [];
+        foreach ($this->originalChildren as $index => $child) {
+            $this->slotNodes[$index] = $child;
+        }
+
+        $this->originalStructureMirrorsChildren = false;
+    }
+
+    /**
+     * Returns the original source text, loading it lazily when configured.
+     */
+    private function materializedOriginalText(): string
+    {
+        if ($this->originalText !== null) {
+            return $this->originalText;
+        }
+
+        if ($this->sourceBuffer === null) {
+            return '';
+        }
+
+        $this->originalText = $this->sourceBuffer->slice($this->startOffset, $this->endOffset);
+
+        return $this->originalText;
     }
 }

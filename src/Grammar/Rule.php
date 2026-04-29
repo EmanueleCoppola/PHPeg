@@ -48,10 +48,11 @@ class Rule
 
         $node = new AstNode(
             $this->name,
-            $context->input()->slice($offset, $result->endOffset()),
+            $context->options()->lazyNodeText() ? null : $context->input()->slice($offset, $result->endOffset()),
             $offset,
             $result->endOffset(),
             $result->nodes(),
+            sourceBuffer: $context->options()->lazyNodeText() ? $context->input() : null,
         );
 
         return new MatchResult($offset, $result->endOffset(), [$node]);
