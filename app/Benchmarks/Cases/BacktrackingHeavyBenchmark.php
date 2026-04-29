@@ -33,9 +33,9 @@ class BacktrackingHeavyBenchmark extends AbstractBenchmarkCase
     public function input(string $scale): string
     {
         $prefixLength = $this->sizeForScale($scale, [
-            'small' => 512,
-            'medium' => 4096,
-            'large' => 16384,
+            'small' => 4096,
+            'medium' => 32768,
+            'large' => 131072,
         ]);
 
         return str_repeat('a', $prefixLength) . 'b';
@@ -55,14 +55,20 @@ class BacktrackingHeavyBenchmark extends AbstractBenchmarkCase
     protected function grammarSource(string $scale): string
     {
         $prefixLength = $this->sizeForScale($scale, [
-            'small' => 512,
-            'medium' => 4096,
-            'large' => 16384,
+            'small' => 4096,
+            'medium' => 32768,
+            'large' => 131072,
         ]);
 
         $alternatives = [];
-        for ($index = 0; $index < 12; $index++) {
-            $suffix = chr(ord('c') + $index);
+        $alternativeCount = $this->sizeForScale($scale, [
+            'small' => 24,
+            'medium' => 64,
+            'large' => 96,
+        ]);
+
+        for ($index = 0; $index < $alternativeCount; $index++) {
+            $suffix = sprintf('x%02d', $index);
             $alternatives[] = '"' . str_repeat('a', $prefixLength) . $suffix . '"';
         }
 

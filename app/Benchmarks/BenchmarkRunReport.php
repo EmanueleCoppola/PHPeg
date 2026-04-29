@@ -79,6 +79,7 @@ class BenchmarkRunReport
             'scale' => $this->options->scale(),
             'iterations' => $this->options->iterations(),
             'filter' => $this->options->filter(),
+            'modes' => $this->options->modes(),
             'results_file' => $this->jsonFile,
             'history_csv' => $this->csvFile,
             'benchmarks' => array_map(static fn (BenchmarkResult $result): array => $result->toArray(), $this->results),

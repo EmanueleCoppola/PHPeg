@@ -19,6 +19,7 @@ class BenchmarkOptions
         private readonly string $scale = 'medium',
         private readonly ?string $filter = null,
         private readonly bool $json = false,
+        private readonly array $modes = [],
     ) {
         if ($iterations < 1) {
             throw new RuntimeException('Iterations must be greater than zero.');
@@ -59,5 +60,22 @@ class BenchmarkOptions
     public function json(): bool
     {
         return $this->json;
+    }
+
+    /**
+     * Returns the requested benchmark mode slugs.
+     *
+     * @return list<string>
+     */
+    public function modes(): array
+    {
+        if ($this->modes === []) {
+            return array_map(
+                static fn (BenchmarkMode $mode): string => $mode->slug(),
+                BenchmarkMode::defaults(),
+            );
+        }
+
+        return array_values($this->modes);
     }
 }

@@ -33,9 +33,9 @@ class LargeArithmeticBenchmark extends AbstractBenchmarkCase
     public function input(string $scale): string
     {
         $operations = $this->sizeForScale($scale, [
-            'small' => 800,
-            'medium' => 1800,
-            'large' => 4000,
+            'small' => 1600,
+            'medium' => 4200,
+            'large' => 9000,
         ]);
 
         $expression = '(1.25 + 2)';

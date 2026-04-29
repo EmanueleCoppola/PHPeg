@@ -23,6 +23,7 @@ class BenchmarkCommand extends Command
                             {--iterations=3 : Number of iterations to run per benchmark}
                             {--scale=medium : Benchmark scale: small, medium, or large}
                             {--filter= : Filter benchmark name or slug}
+                            {--mode=* : Benchmark mode slug(s): default, memoized, fast, memory, limited-cache}
                             {--json : Print machine-readable JSON output}';
 
     /**
@@ -42,6 +43,10 @@ class BenchmarkCommand extends Command
             scale: (string) $this->option('scale'),
             filter: $this->option('filter') !== null && $this->option('filter') !== '' ? (string) $this->option('filter') : null,
             json: (bool) $this->option('json'),
+            modes: array_values(array_filter(
+                is_array($this->option('mode')) ? $this->option('mode') : [],
+                static fn (mixed $mode): bool => is_string($mode) && $mode !== '',
+            )),
         );
 
         $application = new BenchmarkApplication(

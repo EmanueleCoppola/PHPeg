@@ -25,15 +25,17 @@ class BenchmarkRunner
      *
      * @return list<BenchmarkResult>
      */
-    public function run(string $scale, int $iterations, ?string $filter = null): array
+    public function run(string $scale, int $iterations, array $modes, ?string $filter = null): array
     {
         if ($iterations < 1) {
             throw new RuntimeException('Iterations must be greater than zero.');
         }
 
         $results = [];
-        foreach ($this->filteredCases($filter) as $case) {
-            $results[] = $this->runCase($case, $scale, $iterations);
+        foreach ($modes as $mode) {
+            foreach ($this->filteredCases($filter) as $case) {
+                $results[] = $this->runCase($case, $scale, $iterations, $mode);
+            }
         }
 
         if ($results === []) {
@@ -65,7 +67,7 @@ class BenchmarkRunner
     /**
      * Runs one benchmark case for the requested number of iterations.
      */
-    private function runCase(BenchmarkCaseInterface $case, string $scale, int $iterations): BenchmarkResult
+    private function runCase(BenchmarkCaseInterface $case, string $scale, int $iterations, BenchmarkMode $mode): BenchmarkResult
     {
         $grammar = $case->grammar($scale);
         $input = $case->input($scale);
@@ -87,7 +89,7 @@ class BenchmarkRunner
 
                 $before = memory_get_usage(true);
                 $startedAt = hrtime(true);
-                $result = $grammar->parse($input);
+                $result = $grammar->parse($input, options: $mode->parserOptions());
                 $elapsedMs = (hrtime(true) - $startedAt) / 1_000_000;
                 $case->validate($result, $input);
                 $after = memory_get_usage(true);
@@ -103,12 +105,12 @@ class BenchmarkRunner
                 gc_collect_cycles();
             }
         } catch (Throwable $throwable) {
-            return $this->failedResult($case, $iterations, $inputSizeBytes, $times, $peaks, $memoryBefore, $memoryAfter, $memoryDelta, $throwable);
+            return $this->failedResult($case, $iterations, $inputSizeBytes, $times, $peaks, $memoryBefore, $memoryAfter, $memoryDelta, $throwable, $mode);
         }
 
         return new BenchmarkResult(
             $case->name(),
-            $case->slug(),
+            $case->slug() . '@' . $mode->slug(),
             $iterations,
             $inputSizeBytes,
             array_sum($times),
@@ -121,6 +123,13 @@ class BenchmarkRunner
             $this->averageInt($memoryDelta),
             true,
             null,
+            [
+                'mode' => $mode->slug(),
+                'mode_name' => $mode->name(),
+                'parser_options' => $mode->parserOptions()->toArray(),
+                'tradeoff' => $mode->tradeoff(),
+                'benchmark_slug' => $case->slug(),
+            ],
         );
     }
 
@@ -143,10 +152,11 @@ class BenchmarkRunner
         array $memoryAfter,
         array $memoryDelta,
         Throwable $throwable,
+        BenchmarkMode $mode,
     ): BenchmarkResult {
         return new BenchmarkResult(
             $case->name(),
-            $case->slug(),
+            $case->slug() . '@' . $mode->slug(),
             $iterations,
             $inputSizeBytes,
             array_sum($times),
@@ -159,6 +169,13 @@ class BenchmarkRunner
             $this->averageInt($memoryDelta),
             false,
             $throwable->getMessage(),
+            [
+                'mode' => $mode->slug(),
+                'mode_name' => $mode->name(),
+                'parser_options' => $mode->parserOptions()->toArray(),
+                'tradeoff' => $mode->tradeoff(),
+                'benchmark_slug' => $case->slug(),
+            ],
         );
     }
 

@@ -33,9 +33,9 @@ class DeepNestedRecursionBenchmark extends AbstractBenchmarkCase
     public function input(string $scale): string
     {
         $depth = $this->sizeForScale($scale, [
-            'small' => 250,
-            'medium' => 1000,
-            'large' => 2200,
+            'small' => 1000,
+            'medium' => 5000,
+            'large' => 10000,
         ]);
 
         return str_repeat('f(', $depth) . 'value' . str_repeat(')', $depth);

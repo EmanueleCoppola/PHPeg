@@ -18,6 +18,8 @@ class BenchmarkConsoleRenderer
 
         foreach ($report->results() as $result) {
             $output[] = 'Benchmark: ' . $result->name();
+            $output[] = 'Mode: ' . $this->displayExtra($result, 'mode_name', 'unknown');
+            $output[] = 'Parser options: ' . $this->formatOptions($result);
             $output[] = 'Input size: ' . $this->formatBytes($result->inputSizeBytes());
             $output[] = 'Iterations: ' . $result->iterations();
             $output[] = 'Total time: ' . $this->formatMilliseconds($result->totalTimeMs());
@@ -28,6 +30,7 @@ class BenchmarkConsoleRenderer
             $output[] = 'Memory before: ' . $this->formatBytes($result->memoryBeforeBytes());
             $output[] = 'Memory after: ' . $this->formatBytes($result->memoryAfterBytes());
             $output[] = 'Memory delta: ' . $this->formatBytes($result->memoryDeltaBytes(), true);
+            $output[] = 'Tradeoff: ' . $this->displayExtra($result, 'tradeoff', 'n/a');
             $output[] = 'Result: ' . ($result->isSuccess() ? 'OK' : 'FAILED');
 
             if (!$result->isSuccess() && $result->errorMessage() !== null) {
@@ -87,5 +90,50 @@ class BenchmarkConsoleRenderer
         }
 
         return sprintf('%s%.2f %s', $sign, $formatted, $units[$unitIndex]);
+    }
+
+    /**
+     * Returns one string-valued extra field.
+     */
+    private function displayExtra(BenchmarkResult $result, string $key, string $fallback): string
+    {
+        $extra = $result->extra();
+
+        return isset($extra[$key]) && is_string($extra[$key]) ? $extra[$key] : $fallback;
+    }
+
+    /**
+     * Formats parser options from the benchmark result metadata.
+     */
+    private function formatOptions(BenchmarkResult $result): string
+    {
+        $extra = $result->extra();
+        $options = $extra['parser_options'] ?? null;
+        if (!is_array($options)) {
+            return '{}';
+        }
+
+        $pairs = [];
+        foreach ($options as $name => $value) {
+            $pairs[] = sprintf('%s=%s', $name, $this->formatOptionValue($value));
+        }
+
+        return implode(', ', $pairs);
+    }
+
+    /**
+     * Formats one parser option value for console output.
+     */
+    private function formatOptionValue(mixed $value): string
+    {
+        if ($value === null) {
+            return 'null';
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        return (string) $value;
     }
 }

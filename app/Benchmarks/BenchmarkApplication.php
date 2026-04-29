@@ -29,10 +29,11 @@ class BenchmarkApplication
         $this->ensureMemoryLimit();
 
         $runner = new BenchmarkRunner($this->benchmarkCases());
+        $modes = BenchmarkMode::fromSlugs($options->modes());
 
-        $results = $runner->run($options->scale(), $options->iterations(), $options->filter());
+        $results = $runner->run($options->scale(), $options->iterations(), $modes, $options->filter());
         $historyWriter = new BenchmarkHistoryWriter($this->repositoryRoot, $this->resultsDirectory);
-        $paths = $historyWriter->write($options->scale(), $options->iterations(), $results);
+        $paths = $historyWriter->write($options->scale(), $options->iterations(), $options->modes(), $results);
 
         return new BenchmarkRunReport(
             $options,

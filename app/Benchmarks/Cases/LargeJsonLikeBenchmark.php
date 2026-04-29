@@ -35,9 +35,9 @@ class LargeJsonLikeBenchmark extends AbstractBenchmarkCase
     public function input(string $scale): string
     {
         $count = $this->sizeForScale($scale, [
-            'small' => 40,
-            'medium' => 180,
-            'large' => 600,
+            'small' => 120,
+            'medium' => 900,
+            'large' => 2400,
         ]);
 
         $services = [];

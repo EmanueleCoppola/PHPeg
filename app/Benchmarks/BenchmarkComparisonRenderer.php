@@ -31,6 +31,7 @@ class BenchmarkComparisonRenderer
 
         foreach ($report->rows() as $row) {
             $output[] = 'Benchmark: ' . $row->name();
+            $output[] = 'Mode: ' . $row->mode();
 
             if ($row->previousAverageTimeMs() === null || $row->previousPeakMemoryBytes() === null) {
                 $output[] = 'Previous run: unavailable';

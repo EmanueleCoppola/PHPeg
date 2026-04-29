@@ -24,7 +24,7 @@ class BenchmarkHistoryWriter
      * @param list<BenchmarkResult> $results
      * @return array{json_file:string,csv_file:string}
      */
-    public function write(string $scale, int $iterations, array $results): array
+    public function write(string $scale, int $iterations, array $modes, array $results): array
     {
         $this->ensureResultsDirectory();
 
@@ -42,6 +42,7 @@ class BenchmarkHistoryWriter
             'platform' => $metadata['platform'],
             'scale' => $scale,
             'iterations' => $iterations,
+            'modes' => $modes,
             'benchmarks' => array_map(static fn (BenchmarkResult $result): array => $result->toArray(), $results),
         ];
 
@@ -155,18 +156,23 @@ class BenchmarkHistoryWriter
                 'scale',
                 'iterations',
                 'benchmark',
+                'slug',
+                'mode',
                 'input_size_bytes',
                 'avg_time_ms',
                 'min_time_ms',
                 'max_time_ms',
                 'peak_memory_bytes',
                 'memory_delta_bytes',
+                'parser_options',
+                'tradeoff',
                 'status',
                 'error',
             ], ',', '"', '\\');
         }
 
         foreach ($results as $result) {
+            $extra = $result->extra();
             fputcsv($handle, [
                 $timestamp->format(DATE_ATOM),
                 $metadata['git_commit'],
@@ -177,12 +183,16 @@ class BenchmarkHistoryWriter
                 $scale,
                 $iterations,
                 $result->name(),
+                $result->slug(),
+                is_string($extra['mode'] ?? null) ? $extra['mode'] : '',
                 $result->inputSizeBytes(),
                 number_format($result->averageTimeMs(), 4, '.', ''),
                 number_format($result->minTimeMs(), 4, '.', ''),
                 number_format($result->maxTimeMs(), 4, '.', ''),
                 $result->peakMemoryBytes(),
                 $result->memoryDeltaBytes(),
+                json_encode($extra['parser_options'] ?? [], JSON_UNESCAPED_SLASHES),
+                is_string($extra['tradeoff'] ?? null) ? $extra['tradeoff'] : '',
                 $result->isSuccess() ? 'ok' : 'failed',
                 $result->errorMessage(),
             ], ',', '"', '\\');

@@ -15,6 +15,7 @@ class BenchmarkComparisonRow
     public function __construct(
         private readonly string $name,
         private readonly string $slug,
+        private readonly string $mode,
         private readonly ?float $previousAverageTimeMs,
         private readonly float $currentAverageTimeMs,
         private readonly ?float $previousPeakMemoryBytes,
@@ -36,6 +37,14 @@ class BenchmarkComparisonRow
     public function slug(): string
     {
         return $this->slug;
+    }
+
+    /**
+     * Returns the parser mode label.
+     */
+    public function mode(): string
+    {
+        return $this->mode;
     }
 
     /**
