@@ -33,6 +33,11 @@
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
+  "config": {
+    "platform": {
+      "php": "8.1"
+    }
+  },
   "repositories": [
     {
       "name": "packagist",

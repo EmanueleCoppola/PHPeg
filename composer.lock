@@ -4,30 +4,30 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be6f51ebf840bd9e1de8027da7bd4820",
+    "content-hash": "43f5322249751cb2be02b259367667bc",
     "packages": [],
     "packages-dev": [
         {
             "name": "brick/math",
-            "version": "0.14.8",
+            "version": "0.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "63422359a44b7f06cae63c3b429b59e8efcc0629"
+                "reference": "fc7ed316430118cc7836bf45faff18d5dfc8de04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/63422359a44b7f06cae63c3b429b59e8efcc0629",
-                "reference": "63422359a44b7f06cae63c3b429b59e8efcc0629",
+                "url": "https://api.github.com/repos/brick/math/zipball/fc7ed316430118cc7836bf45faff18d5dfc8de04",
+                "reference": "fc7ed316430118cc7836bf45faff18d5dfc8de04",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.2"
+                "php": "^8.1"
             },
             "require-dev": {
                 "php-coveralls/php-coveralls": "^2.2",
-                "phpstan/phpstan": "2.1.22",
-                "phpunit/phpunit": "^11.5"
+                "phpunit/phpunit": "^10.1",
+                "vimeo/psalm": "6.8.8"
             },
             "type": "library",
             "autoload": {
@@ -57,7 +57,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.14.8"
+                "source": "https://github.com/brick/math/tree/0.13.1"
             },
             "funding": [
                 {
@@ -65,7 +65,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-10T14:33:43+00:00"
+            "time": "2025-03-29T13:50:30+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -228,20 +228,20 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "v3.6.0",
+            "version": "v3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "d61a8a9604ec1f8c3d150d09db6ce98b32675013"
+                "reference": "1b2de7f4a468165dca07b142240733a1973e766d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/d61a8a9604ec1f8c3d150d09db6ce98b32675013",
-                "reference": "d61a8a9604ec1f8c3d150d09db6ce98b32675013",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/1b2de7f4a468165dca07b142240733a1973e766d",
+                "reference": "1b2de7f4a468165dca07b142240733a1973e766d",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.2|^8.3|^8.4|^8.5"
+                "php": "^7.2|^8.0"
             },
             "replace": {
                 "mtdowling/cron-expression": "^1.0"
@@ -280,7 +280,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dragonmantank/cron-expression/issues",
-                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.6.0"
+                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.5.0"
             },
             "funding": [
                 {
@@ -288,7 +288,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-31T18:51:33+00:00"
+            "time": "2025-10-31T18:36:32+00:00"
         },
         {
             "name": "filp/whoops",
@@ -2212,25 +2212,25 @@
         },
         {
             "name": "nunomaduro/laravel-console-task",
-            "version": "v1.10.0",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/laravel-console-task.git",
-                "reference": "9d11073ad8b0215c63a962250e2bf071611f975d"
+                "reference": "02b2a550318fda3355e45763885e30b4e650bc1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/laravel-console-task/zipball/9d11073ad8b0215c63a962250e2bf071611f975d",
-                "reference": "9d11073ad8b0215c63a962250e2bf071611f975d",
+                "url": "https://api.github.com/repos/nunomaduro/laravel-console-task/zipball/02b2a550318fda3355e45763885e30b4e650bc1b",
+                "reference": "02b2a550318fda3355e45763885e30b4e650bc1b",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^10.0|^11.0|^12.0",
-                "illuminate/support": "^10.0|^11.0|^12.0",
-                "php": "^8.2"
+                "illuminate/console": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
             },
             "require-dev": {
-                "pestphp/pest": "^3.7"
+                "pestphp/pest": "^2.34"
             },
             "type": "library",
             "extra": {
@@ -2270,31 +2270,31 @@
                 "issues": "https://github.com/nunomaduro/laravel-console-task/issues",
                 "source": "https://github.com/nunomaduro/laravel-console-task"
             },
-            "time": "2025-02-19T11:02:37+00:00"
+            "time": "2024-04-11T07:51:10+00:00"
         },
         {
             "name": "nunomaduro/laravel-desktop-notifier",
-            "version": "v2.10.0",
+            "version": "v2.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/laravel-desktop-notifier.git",
-                "reference": "0454df17906c4d29ed87f563b121e3224c9655b1"
+                "reference": "9937f1f8898077ad6d058c03ecee39d6eae7eb39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/laravel-desktop-notifier/zipball/0454df17906c4d29ed87f563b121e3224c9655b1",
-                "reference": "0454df17906c4d29ed87f563b121e3224c9655b1",
+                "url": "https://api.github.com/repos/nunomaduro/laravel-desktop-notifier/zipball/9937f1f8898077ad6d058c03ecee39d6eae7eb39",
+                "reference": "9937f1f8898077ad6d058c03ecee39d6eae7eb39",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
-                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/console": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
                 "jolicode/jolinotif": "^2.5",
-                "php": "^8.2"
+                "php": "^8.1"
             },
             "require-dev": {
-                "graham-campbell/testbench": "^5.7|^6.2",
-                "pestphp/pest": "^3.7|^4.4"
+                "graham-campbell/testbench": "^5.7|^6.1",
+                "pestphp/pest": "^2.34"
             },
             "type": "library",
             "extra": {
@@ -2338,9 +2338,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/laravel-desktop-notifier/issues",
-                "source": "https://github.com/nunomaduro/laravel-desktop-notifier/tree/v2.10.0"
+                "source": "https://github.com/nunomaduro/laravel-desktop-notifier/tree/v2.8.1"
             },
-            "time": "2026-02-24T09:42:50+00:00"
+            "time": "2024-04-06T06:39:11+00:00"
         },
         {
             "name": "nunomaduro/termwind",
@@ -5454,23 +5454,22 @@
         },
         {
             "name": "symfony/string",
-            "version": "v7.4.8",
+            "version": "v6.4.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "114ac57257d75df748eda23dd003878080b8e688"
+                "reference": "2adaf4106f2ef4c67271971bde6d3fe0a6936432"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/114ac57257d75df748eda23dd003878080b8e688",
-                "reference": "114ac57257d75df748eda23dd003878080b8e688",
+                "url": "https://api.github.com/repos/symfony/string/zipball/2adaf4106f2ef4c67271971bde6d3fe0a6936432",
+                "reference": "2adaf4106f2ef4c67271971bde6d3fe0a6936432",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
+                "php": ">=8.1",
                 "symfony/polyfill-ctype": "~1.8",
-                "symfony/polyfill-intl-grapheme": "~1.33",
+                "symfony/polyfill-intl-grapheme": "~1.0",
                 "symfony/polyfill-intl-normalizer": "~1.0",
                 "symfony/polyfill-mbstring": "~1.0"
             },
@@ -5478,11 +5477,10 @@
                 "symfony/translation-contracts": "<2.5"
             },
             "require-dev": {
-                "symfony/emoji": "^7.1|^8.0",
-                "symfony/http-client": "^6.4|^7.0|^8.0",
-                "symfony/intl": "^6.4|^7.0|^8.0",
+                "symfony/http-client": "^5.4|^6.0|^7.0",
+                "symfony/intl": "^6.2|^7.0",
                 "symfony/translation-contracts": "^2.5|^3.0",
-                "symfony/var-exporter": "^6.4|^7.0|^8.0"
+                "symfony/var-exporter": "^5.4|^6.0|^7.0"
             },
             "type": "library",
             "autoload": {
@@ -5521,7 +5519,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v7.4.8"
+                "source": "https://github.com/symfony/string/tree/v6.4.34"
             },
             "funding": [
                 {
@@ -5541,7 +5539,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-24T13:12:05+00:00"
+            "time": "2026-02-08T20:44:54+00:00"
         },
         {
             "name": "symfony/translation",
@@ -6030,5 +6028,8 @@
         "php": ">=8.1 <9.0"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.1"
+    },
     "plugin-api-version": "2.9.0"
 }
