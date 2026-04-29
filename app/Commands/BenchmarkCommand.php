@@ -23,7 +23,7 @@ class BenchmarkCommand extends Command
                             {--iterations=3 : Number of iterations to run per benchmark}
                             {--scale=medium : Benchmark scale: small, medium, or large}
                             {--filter= : Filter benchmark name or slug}
-                            {--mode=* : Benchmark mode slug(s): default, memoized, fast, memory, limited-cache}
+                            {--mode=* : Benchmark mode slug(s): default, speed, memory}
                             {--json : Print machine-readable JSON output}';
 
     /**

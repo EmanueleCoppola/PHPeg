@@ -35,31 +35,23 @@ class BenchmarkMode
                 'default',
                 'Default parser settings',
                 ParserOptions::defaults(),
-                'Compatibility mode with full errors and unbounded memoization.',
+                'Balanced default with full errors, unbounded memoization, and lazy node text.',
             ),
             new self(
-                'memoized',
-                'Memoization enabled',
-                ParserOptions::defaults()->withMemoization(true),
-                'Explicit packrat-style memoization for grammars that revisit the same rule and offset.',
-            ),
-            new self(
-                'fast',
-                'Fast mode',
-                ParserOptions::fast(),
-                'Faster success path by reusing zero-width matches and reducing detailed error bookkeeping.',
+                'speed',
+                'Speed optimized',
+                ParserOptions::defaults()
+                    ->withMemoization(true)
+                    ->withLazyNodeText(true)
+                    ->withOptimizeErrors(true)
+                    ->withReuseEmptyMatches(true),
+                'Combines the strongest successful-parse optimizations for throughput-oriented parsing.',
             ),
             new self(
                 'memory',
-                'Memory optimized mode',
-                ParserOptions::memoryOptimized(),
-                'Lower memory pressure by avoiding memoization caches and extra zero-width match reuse.',
-            ),
-            new self(
-                'limited-cache',
-                'Memoization with limited cache',
-                ParserOptions::defaults()->withMaxCacheEntries(2048),
-                'Caps memoization growth to bound memory usage at the cost of extra recomputation.',
+                'Memory optimized',
+                ParserOptions::defaults()->withMemoization(false)->withLazyNodeText(true),
+                'Disables memoization and avoids eager node text copies to reduce parser memory pressure.',
             ),
         ];
     }

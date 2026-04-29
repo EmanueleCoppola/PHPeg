@@ -30,6 +30,7 @@ php bin/phpeg benchmark --scale=small
 php bin/phpeg benchmark --scale=medium
 php bin/phpeg benchmark --scale=large
 php bin/phpeg benchmark --filter=arithmetic
+php bin/phpeg benchmark --mode=default --mode=speed
 php bin/phpeg benchmark --json
 ```
 
@@ -42,6 +43,12 @@ php bin/phpeg benchmark --json
 `--iterations` repeats each benchmark and reports total, average, minimum, and maximum parse time. Memory metrics are reported as average memory before parsing, average memory after parsing, average delta, and maximum observed peak memory.
 
 `--filter` matches either the benchmark name or slug and lets you focus on a single case such as `arithmetic`, `json`, `recursion`, or `backtracking`.
+
+`--mode` selects one or more explicit flag combinations. When omitted, the suite runs:
+
+- `default`: memoization with lazy node text and full error tracking
+- `speed`: default plus lighter successful-parse error tracking and empty-match reuse
+- `memory`: memoization disabled, with lazy node text still enabled
 
 `--json` prints machine-readable output to stdout for CI or scripting. Historical files are still written to disk.
 
@@ -76,7 +83,7 @@ php bin/phpeg benchmark:compare
 composer benchmark:compare
 ```
 
-The comparison command reads the two most recent JSON result files and shows the previous and current average time and peak memory for each benchmark, along with the percentage change.
+The comparison command reads the two most recent JSON result files and shows the previous and current average time and peak memory for each benchmark and parser mode, along with the percentage change.
 
 ## Interpreting Regressions
 

@@ -34,8 +34,8 @@ class BacktrackingHeavyBenchmark extends AbstractBenchmarkCase
     {
         $prefixLength = $this->sizeForScale($scale, [
             'small' => 4096,
-            'medium' => 32768,
-            'large' => 131072,
+            'medium' => 16384,
+            'large' => 65536,
         ]);
 
         return str_repeat('a', $prefixLength) . 'b';
@@ -54,28 +54,22 @@ class BacktrackingHeavyBenchmark extends AbstractBenchmarkCase
      */
     protected function grammarSource(string $scale): string
     {
-        $prefixLength = $this->sizeForScale($scale, [
-            'small' => 4096,
-            'medium' => 32768,
-            'large' => 131072,
-        ]);
-
         $alternatives = [];
         $alternativeCount = $this->sizeForScale($scale, [
-            'small' => 24,
+            'small' => 16,
             'medium' => 64,
             'large' => 96,
         ]);
 
         for ($index = 0; $index < $alternativeCount; $index++) {
             $suffix = sprintf('x%02d', $index);
-            $alternatives[] = '"' . str_repeat('a', $prefixLength) . $suffix . '"';
+            $alternatives[] = 'SharedTail "' . $suffix . '"';
         }
 
-        $alternatives[] = '"' . str_repeat('a', $prefixLength) . 'b"';
+        $alternatives[] = 'SharedTail "b"';
 
         return sprintf(
-            "Candidate = %s\nStart = Candidate EOF\n",
+            "SharedTail = \"a\" SharedTail / \"\"\nCandidate = %s\nStart = Candidate EOF\n",
             implode(' / ', $alternatives),
         );
     }
