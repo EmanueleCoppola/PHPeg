@@ -42,7 +42,9 @@ class OneOrMoreExpression extends AbstractExpression
             }
 
             $cursor = $result->endOffset();
-            array_push($nodes, ...$result->nodes());
+            foreach ($result->nodes() as $node) {
+                $nodes[] = $node;
+            }
         }
 
         return new MatchResult($offset, $cursor, $nodes);

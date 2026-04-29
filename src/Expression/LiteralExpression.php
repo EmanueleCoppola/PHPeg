@@ -12,9 +12,15 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class LiteralExpression extends AbstractExpression
 {
+    private readonly int $length;
+
+    private readonly string $description;
+
     public function __construct(
         private readonly string $literal,
     ) {
+        $this->length = strlen($literal);
+        $this->description = sprintf('"%s"', $literal);
     }
 
     /**
@@ -27,17 +33,17 @@ class LiteralExpression extends AbstractExpression
 
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
-        if (substr_compare($context->input()->text(), $this->literal, $offset, strlen($this->literal)) !== 0) {
+        if (substr_compare($context->input()->text(), $this->literal, $offset, $this->length) !== 0) {
             $context->recordFailure($offset, $this->describe());
 
             return null;
         }
 
-        return new MatchResult($offset, $offset + strlen($this->literal));
+        return new MatchResult($offset, $offset + $this->length);
     }
 
     public function describe(): string
     {
-        return sprintf('"%s"', $this->literal);
+        return $this->description;
     }
 }

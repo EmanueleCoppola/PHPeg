@@ -20,7 +20,7 @@ class EndOfInputExpression extends AbstractExpression
             return null;
         }
 
-        return MatchResult::empty($offset);
+        return $context->emptyMatch($offset);
     }
 
     public function describe(): string

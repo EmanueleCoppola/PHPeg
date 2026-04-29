@@ -9,9 +9,17 @@ namespace EmanueleCoppola\PHPeg\Parser;
  */
 class InputBuffer
 {
+    private readonly int $length;
+
+    /**
+     * @var list<int>|null
+     */
+    private ?array $lineBreakOffsets = null;
+
     public function __construct(
         private readonly string $input,
     ) {
+        $this->length = strlen($input);
     }
 
     /**
@@ -27,7 +35,7 @@ class InputBuffer
      */
     public function length(): int
     {
-        return strlen($this->input);
+        return $this->length;
     }
 
     /**
@@ -43,7 +51,7 @@ class InputBuffer
      */
     public function charAt(int $offset): ?string
     {
-        if ($offset < 0 || $offset >= $this->length()) {
+        if ($offset < 0 || $offset >= $this->length) {
             return null;
         }
 
@@ -55,21 +63,18 @@ class InputBuffer
      */
     public function lineAndColumn(int $offset): array
     {
-        $offset = max(0, min($offset, $this->length()));
-        $line = 1;
-        $column = 1;
+        $offset = max(0, min($offset, $this->length));
+        $lineBreakOffsets = $this->lineBreakOffsets();
+        $lineIndex = 0;
+        $lineCount = count($lineBreakOffsets);
 
-        for ($index = 0; $index < $offset; $index++) {
-            if ($this->input[$index] === "\n") {
-                $line++;
-                $column = 1;
-                continue;
-            }
-
-            $column++;
+        while ($lineIndex < $lineCount && $lineBreakOffsets[$lineIndex] < $offset) {
+            $lineIndex++;
         }
 
-        return ['line' => $line, 'column' => $column];
+        $lineStart = $lineIndex === 0 ? 0 : $lineBreakOffsets[$lineIndex - 1] + 1;
+
+        return ['line' => $lineIndex + 1, 'column' => ($offset - $lineStart) + 1];
     }
 
     /**
@@ -78,10 +83,33 @@ class InputBuffer
     public function snippet(int $offset, int $radius = 20): string
     {
         $start = max(0, $offset - $radius);
-        $length = min($this->length(), $offset + $radius) - $start;
+        $length = min($this->length, $offset + $radius) - $start;
         $snippet = substr($this->input, $start, $length);
         $snippet = str_replace(["\r", "\n", "\t"], ['\\r', '\\n', '\\t'], $snippet);
 
         return sprintf('"%s"', $snippet);
+    }
+
+    /**
+     * Returns newline offsets for line and column calculations.
+     *
+     * @return list<int>
+     */
+    private function lineBreakOffsets(): array
+    {
+        if ($this->lineBreakOffsets !== null) {
+            return $this->lineBreakOffsets;
+        }
+
+        $offsets = [];
+        for ($index = 0; $index < $this->length; $index++) {
+            if ($this->input[$index] === "\n") {
+                $offsets[] = $index;
+            }
+        }
+
+        $this->lineBreakOffsets = $offsets;
+
+        return $this->lineBreakOffsets;
     }
 }

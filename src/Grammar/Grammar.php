@@ -10,6 +10,7 @@ use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
 use EmanueleCoppola\PHPeg\Parser\ParseContext;
 use EmanueleCoppola\PHPeg\Parser\InputBuffer;
 use EmanueleCoppola\PHPeg\Parser\Parser;
+use EmanueleCoppola\PHPeg\Parser\ParserOptions;
 use EmanueleCoppola\PHPeg\Result\ParseResult;
 
 /**
@@ -53,19 +54,19 @@ class Grammar
     /**
      * Parses input using the configured grammar.
      */
-    public function parse(string $input, ?string $startRule = null): ParseResult
+    public function parse(string $input, ?string $startRule = null, ?ParserOptions $options = null): ParseResult
     {
-        $parser = new Parser();
+        $parser = new Parser($options ?? new ParserOptions());
 
-        return $parser->parse($this, $input, $startRule);
+        return $parser->parse($this, $input, $startRule, $options);
     }
 
     /**
      * Parses an editable source-preserving document.
      */
-    public function parseDocument(string $input, ?string $startRule = null): ParsedDocument
+    public function parseDocument(string $input, ?string $startRule = null, ?ParserOptions $options = null): ParsedDocument
     {
-        $result = $this->parse($input, $startRule);
+        $result = $this->parse($input, $startRule, $options);
         if (!$result->isSuccess() || $result->node() === null) {
             throw new RuntimeException($result->error()?->message() ?? 'Unable to parse document.');
         }
@@ -76,8 +77,8 @@ class Grammar
     /**
      * Creates a parse context for this grammar and input text.
      */
-    public function contextFor(string $input): ParseContext
+    public function contextFor(string $input, ?ParserOptions $options = null): ParseContext
     {
-        return new ParseContext($this, new InputBuffer($input));
+        return new ParseContext($this, new InputBuffer($input), $options ?? new ParserOptions());
     }
 }

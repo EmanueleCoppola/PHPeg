@@ -19,6 +19,11 @@ class ParseContext
      */
     private array $memo = [];
 
+    /**
+     * @var list<array{rule:string,offset:int}>
+     */
+    private array $memoOrder = [];
+
     private int $furthestOffset = 0;
 
     /**
@@ -26,15 +31,35 @@ class ParseContext
      */
     private array $expected = [];
 
+    private ?string $optimizedExpected = null;
+
     /**
      * @var array<string, array<int, true>>
      */
     private array $activeRules = [];
 
+    /**
+     * @var array<int, MatchResult>
+     */
+    private array $emptyMatches = [];
+
+    private readonly bool $memoizationEnabled;
+
+    private readonly bool $optimizeErrors;
+
+    private readonly bool $reuseEmptyMatches;
+
+    private readonly ?int $maxCacheEntries;
+
     public function __construct(
         private readonly Grammar $grammar,
         private readonly InputBuffer $input,
+        private readonly ParserOptions $options = new ParserOptions(),
     ) {
+        $this->memoizationEnabled = $options->memoizationEnabled();
+        $this->optimizeErrors = $options->optimizeErrors();
+        $this->reuseEmptyMatches = $options->reuseEmptyMatches();
+        $this->maxCacheEntries = $options->maxCacheEntries();
     }
 
     /**
@@ -54,6 +79,14 @@ class ParseContext
     }
 
     /**
+     * Returns the active parser options.
+     */
+    public function options(): ParserOptions
+    {
+        return $this->options;
+    }
+
+    /**
      * Matches a named rule with memoization.
      */
     public function matchRule(string $ruleName, int $offset): ?MatchResult
@@ -65,18 +98,20 @@ class ParseContext
             return null;
         }
 
-        if (array_key_exists($offset, $this->memo[$ruleName] ?? [])) {
-            return $this->memo[$ruleName][$offset];
-        }
-
         if (($this->activeRules[$ruleName][$offset] ?? false) === true) {
             throw new LeftRecursionException($ruleName, $offset);
+        }
+
+        if ($this->memoizationEnabled) {
+            if (array_key_exists($offset, $this->memo[$ruleName] ?? [])) {
+                return $this->memo[$ruleName][$offset];
+            }
         }
 
         $this->activeRules[$ruleName][$offset] = true;
 
         try {
-            $this->memo[$ruleName][$offset] = $rule->match($this, $offset);
+            $result = $rule->match($this, $offset);
         } finally {
             unset($this->activeRules[$ruleName][$offset]);
             if ($this->activeRules[$ruleName] === []) {
@@ -84,7 +119,11 @@ class ParseContext
             }
         }
 
-        return $this->memo[$ruleName][$offset];
+        if ($this->memoizationEnabled) {
+            $this->storeMemoizedResult($ruleName, $offset, $result);
+        }
+
+        return $result;
     }
 
     /**
@@ -94,7 +133,20 @@ class ParseContext
     {
         if ($offset > $this->furthestOffset) {
             $this->furthestOffset = $offset;
+            if ($this->optimizeErrors) {
+                $this->optimizedExpected = $expected;
+                $this->expected = [];
+
+                return;
+            }
+
             $this->expected = [$expected => true];
+
+            return;
+        }
+
+        if ($offset === $this->furthestOffset && $this->optimizeErrors) {
+            $this->optimizedExpected ??= $expected;
 
             return;
         }
@@ -105,18 +157,63 @@ class ParseContext
     }
 
     /**
+     * Returns a cached zero-width match at the given offset when enabled.
+     */
+    public function emptyMatch(int $offset): MatchResult
+    {
+        if (!$this->reuseEmptyMatches) {
+            return MatchResult::empty($offset);
+        }
+
+        if (!isset($this->emptyMatches[$offset])) {
+            $this->emptyMatches[$offset] = MatchResult::empty($offset);
+        }
+
+        return $this->emptyMatches[$offset];
+    }
+
+    /**
      * Builds the final parse error.
      */
     public function error(): ParseError
     {
         $position = $this->input->lineAndColumn($this->furthestOffset);
+        $expected = $this->optimizeErrors
+            ? ($this->optimizedExpected === null ? [] : [$this->optimizedExpected])
+            : array_keys($this->expected);
 
         return new ParseError(
             $this->furthestOffset,
             $position['line'],
             $position['column'],
-            array_keys($this->expected),
+            $expected,
             $this->input->snippet($this->furthestOffset),
         );
+    }
+
+    /**
+     * Stores a memoized rule result and applies the configured cache limit.
+     */
+    private function storeMemoizedResult(string $ruleName, int $offset, ?MatchResult $result): void
+    {
+        $this->memo[$ruleName][$offset] = $result;
+
+        if ($this->maxCacheEntries === null) {
+            return;
+        }
+
+        $this->memoOrder[] = ['rule' => $ruleName, 'offset' => $offset];
+
+        while (count($this->memoOrder) > $this->maxCacheEntries) {
+            $entry = array_shift($this->memoOrder);
+            if ($entry === null) {
+                return;
+            }
+
+            unset($this->memo[$entry['rule']][$entry['offset']]);
+            if ($this->memo[$entry['rule']] === []) {
+                unset($this->memo[$entry['rule']]);
+            }
+        }
     }
 }

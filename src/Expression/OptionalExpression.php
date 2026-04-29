@@ -27,7 +27,7 @@ class OptionalExpression extends AbstractExpression
 
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
-        return $this->expression->match($context, $offset) ?? MatchResult::empty($offset);
+        return $this->expression->match($context, $offset) ?? $context->emptyMatch($offset);
     }
 
     public function describe(): string

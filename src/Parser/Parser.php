@@ -15,41 +15,66 @@ use EmanueleCoppola\PHPeg\Result\ParseResult;
 class Parser
 {
     /**
+     * Creates a parser with the provided options.
+     */
+    public function __construct(
+        private readonly ParserOptions $options = new ParserOptions(),
+    ) {
+    }
+
+    /**
+     * Returns a copy of the parser with updated options.
+     */
+    public function withOptions(ParserOptions $options): self
+    {
+        return new self($options);
+    }
+
+    /**
+     * Returns the parser options.
+     */
+    public function options(): ParserOptions
+    {
+        return $this->options;
+    }
+
+    /**
      * Parses input with the provided grammar.
      */
-    public function parse(Grammar $grammar, string $input, ?string $startRule = null): ParseResult
+    public function parse(Grammar $grammar, string $input, ?string $startRule = null, ?ParserOptions $options = null): ParseResult
     {
         $ruleName = $startRule ?? $grammar->startRule();
-        $context = $grammar->contextFor($input);
+        $context = $grammar->contextFor($input, $options ?? $this->options);
+        $inputBuffer = $context->input();
 
         try {
             $result = $context->matchRule($ruleName, 0);
         } catch (LeftRecursionException $exception) {
-            $position = $context->input()->lineAndColumn($exception->offset());
+            $position = $inputBuffer->lineAndColumn($exception->offset());
 
             return ParseResult::failure(
                 $exception->offset(),
-                substr($input, 0, $exception->offset()),
+                $inputBuffer->slice(0, $exception->offset()),
                 ParseError::leftRecursion(
                     $exception->ruleName(),
                     $exception->offset(),
                     $position['line'],
                     $position['column'],
-                    $context->input()->snippet($exception->offset()),
+                    $inputBuffer->snippet($exception->offset()),
                 ),
             );
         }
 
-        if ($result === null || $result->endOffset() !== strlen($input)) {
+        if ($result === null || $result->endOffset() !== $inputBuffer->length()) {
             return ParseResult::failure(
                 $result?->endOffset() ?? 0,
-                $result === null ? '' : substr($input, 0, $result->endOffset()),
+                $result === null ? '' : $inputBuffer->slice(0, $result->endOffset()),
                 $context->error(),
             );
         }
 
         $nodes = $result->nodes();
 
-        return ParseResult::success($result->endOffset(), substr($input, 0, $result->endOffset()), $nodes[0]);
+        return ParseResult::success($result->endOffset(), $inputBuffer->slice(0, $result->endOffset()), $nodes[0]);
     }
 }

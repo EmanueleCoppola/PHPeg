@@ -15,6 +15,8 @@ class RegexExpression extends AbstractExpression
 {
     private readonly string $regex;
 
+    private readonly string $description;
+
     public function __construct(
         private readonly string $pattern,
     ) {
@@ -28,6 +30,7 @@ class RegexExpression extends AbstractExpression
         }
 
         $this->regex = $regex;
+        $this->description = sprintf('regex(%s)', $pattern);
     }
 
     /**
@@ -51,6 +54,6 @@ class RegexExpression extends AbstractExpression
 
     public function describe(): string
     {
-        return sprintf('regex(%s)', $this->pattern);
+        return $this->description;
     }
 }

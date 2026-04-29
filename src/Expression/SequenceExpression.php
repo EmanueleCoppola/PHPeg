@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace EmanueleCoppola\PHPeg\Expression;
 
-use EmanueleCoppola\PHPeg\Ast\AstNode;
 use EmanueleCoppola\PHPeg\Parser\ParseContext;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
 
@@ -41,7 +40,9 @@ class SequenceExpression extends AbstractExpression
             }
 
             $cursor = $result->endOffset();
-            array_push($nodes, ...$result->nodes());
+            foreach ($result->nodes() as $node) {
+                $nodes[] = $node;
+            }
         }
 
         return new MatchResult($offset, $cursor, $nodes);
