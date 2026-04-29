@@ -7,9 +7,13 @@
     "php": ">=8.1 <9.0"
   },
   "require-dev": {
+    "laravel-zero/framework": "^10.48.25",
     "phpunit/phpunit": "^10.5 || ^11.5",
     "symfony/polyfill-mbstring": "^1.37"
   },
+  "bin": [
+    "bin/phpeg"
+  ],
   "autoload": {
     "psr-4": {
       "EmanueleCoppola\\PHPPeg\\": "src/"
@@ -17,12 +21,15 @@
   },
   "autoload-dev": {
     "psr-4": {
+      "EmanueleCoppola\\PHPeg\\App\\": "app/",
       "EmanueleCoppola\\PHPPeg\\Tests\\": "tests/"
     }
   },
   "scripts": {
     "test": "phpunit",
-    "test:coverage": "phpunit --coverage-text"
+    "test:coverage": "phpunit --coverage-text",
+    "benchmark": "php bin/phpeg benchmark",
+    "benchmark:compare": "php bin/phpeg benchmark:compare"
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
