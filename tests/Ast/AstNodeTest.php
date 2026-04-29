@@ -59,6 +59,26 @@ class AstNodeTest extends TestCase
     }
 
     /**
+     * Verifies source-preserving child snapshots remain correct after lazy initialization.
+     */
+    public function testRetainsOriginalChildSnapshotsAcrossMutations(): void
+    {
+        $factory = new AstNodeFactory();
+        $root = $this->originalTree();
+        $originalDirective = $root->firstChild('Directive');
+
+        self::assertNotNull($originalDirective);
+        self::assertSame([$originalDirective], $root->originalChildren());
+        self::assertSame($originalDirective, $root->slotNodes()[0] ?? null);
+
+        $replacement = $factory->token('Directive', 'listen 80;');
+        $originalDirective->replaceWith($replacement);
+
+        self::assertSame([$originalDirective], $root->originalChildren());
+        self::assertSame($replacement, $root->slotNodes()[0] ?? null);
+    }
+
+    /**
      * Builds a small editable AST used by the node tests.
      */
     private function tree(): AstNode
@@ -69,5 +89,17 @@ class AstNodeTest extends TestCase
         $directive = $factory->node('Directive', [$identifier, $value], 'server example.com', ['name' => 'server']);
 
         return $factory->node('Block', [$directive], "{\n    server example.com\n}", ['name' => 'root']);
+    }
+
+    /**
+     * Builds a parsed-like AST whose nodes are marked as original.
+     */
+    private function originalTree(): AstNode
+    {
+        $identifier = new AstNode('Identifier', 'server', 6, 12, isOriginal: true);
+        $value = new AstNode('Value', 'example.com', 13, 24, isOriginal: true);
+        $directive = new AstNode('Directive', 'server example.com', 6, 24, [$identifier, $value], ['name' => 'server'], true);
+
+        return new AstNode('Block', "{\n    server example.com\n}", 0, 27, [$directive], ['name' => 'root'], true);
     }
 }

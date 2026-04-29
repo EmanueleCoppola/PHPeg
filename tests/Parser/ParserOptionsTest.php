@@ -10,43 +10,35 @@ use PHPUnit\Framework\TestCase;
 class ParserOptionsTest extends TestCase
 {
     /**
-     * Verifies the default parser options preserve compatibility behavior.
+     * Verifies the default parser options use the memory-safe baseline configuration.
      */
     public function testDefaultsExposeCompatibilitySettings(): void
     {
         $options = ParserOptions::defaults();
 
         self::assertTrue($options->memoizationEnabled());
-        self::assertFalse($options->memoryOptimizedEnabled());
-        self::assertFalse($options->fastModeEnabled());
         self::assertNull($options->maxCacheEntries());
         self::assertFalse($options->optimizeErrors());
         self::assertFalse($options->reuseEmptyMatches());
+        self::assertTrue($options->lazyNodeText());
     }
 
     /**
-     * Verifies the speed-oriented preset enables the documented tradeoffs.
+     * Verifies individual option toggles return updated immutable copies.
      */
-    public function testFastPresetEnablesSpeedTradeoffs(): void
+    public function testSupportsExplicitOptionToggles(): void
     {
-        $options = ParserOptions::fast();
-
-        self::assertTrue($options->memoizationEnabled());
-        self::assertTrue($options->fastModeEnabled());
-        self::assertTrue($options->optimizeErrors());
-        self::assertTrue($options->reuseEmptyMatches());
-    }
-
-    /**
-     * Verifies the memory-oriented preset disables cache-heavy features.
-     */
-    public function testMemoryPresetDisablesCacheHeavyFeatures(): void
-    {
-        $options = ParserOptions::memoryOptimized();
+        $options = ParserOptions::defaults()
+            ->withMemoization(false)
+            ->withMaxCacheEntries(512)
+            ->withOptimizeErrors(true)
+            ->withReuseEmptyMatches(true)
+            ->withLazyNodeText(true);
 
         self::assertFalse($options->memoizationEnabled());
-        self::assertTrue($options->memoryOptimizedEnabled());
-        self::assertSame(0, $options->maxCacheEntries());
-        self::assertFalse($options->reuseEmptyMatches());
+        self::assertSame(512, $options->maxCacheEntries());
+        self::assertTrue($options->optimizeErrors());
+        self::assertTrue($options->reuseEmptyMatches());
+        self::assertTrue($options->lazyNodeText());
     }
 }
