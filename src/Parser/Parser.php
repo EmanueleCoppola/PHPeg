@@ -6,6 +6,7 @@ namespace EmanueleCoppola\PHPeg\Parser;
 
 use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
 use EmanueleCoppola\PHPeg\Error\ParseError;
+use EmanueleCoppola\PHPeg\Lake\LakeAnalysisException;
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
 use EmanueleCoppola\PHPeg\Result\ParseResult;
 
@@ -44,11 +45,17 @@ class Parser
     public function parse(Grammar $grammar, string $input, ?string $startRule = null, ?ParserOptions $options = null): ParseResult
     {
         $ruleName = $startRule ?? $grammar->startRule();
-        $context = $grammar->contextFor($input, $options ?? $this->options);
-        $inputBuffer = $context->input();
 
         try {
+            $context = $grammar->contextFor($input, $options ?? $this->options);
+            $inputBuffer = $context->input();
             $result = $context->matchRule($ruleName, 0);
+        } catch (LakeAnalysisException $exception) {
+            return ParseResult::failure(
+                0,
+                '',
+                new ParseError(0, 1, 1, [], '', $exception->getMessage()),
+            );
         } catch (LeftRecursionException $exception) {
             $position = $inputBuffer->lineAndColumn($exception->offset());
 

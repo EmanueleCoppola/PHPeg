@@ -27,7 +27,7 @@ class NotPredicateExpression extends AbstractExpression
 
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
-        if ($this->expression->match($context, $offset) !== null) {
+        if ($context->matchExpressionSilently($this->expression, $offset) !== null) {
             $context->recordFailure($offset, $this->describe());
 
             return null;

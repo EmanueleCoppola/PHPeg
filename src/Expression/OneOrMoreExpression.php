@@ -27,7 +27,7 @@ class OneOrMoreExpression extends AbstractExpression
 
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
-        $first = $this->expression->match($context, $offset);
+        $first = $context->matchExpression($this->expression, $offset);
         if ($first === null) {
             return null;
         }
@@ -36,7 +36,7 @@ class OneOrMoreExpression extends AbstractExpression
         $cursor = $first->endOffset();
 
         while (true) {
-            $result = $this->expression->match($context, $cursor);
+            $result = $context->matchExpression($this->expression, $cursor);
             if ($result === null || $result->endOffset() === $cursor) {
                 break;
             }

@@ -31,7 +31,7 @@ class ZeroOrMoreExpression extends AbstractExpression
         $cursor = $offset;
 
         while (true) {
-            $result = $this->expression->match($context, $cursor);
+            $result = $context->matchExpression($this->expression, $cursor);
             if ($result === null || $result->endOffset() === $cursor) {
                 break;
             }

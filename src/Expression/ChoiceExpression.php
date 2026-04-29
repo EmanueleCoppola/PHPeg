@@ -31,7 +31,7 @@ class ChoiceExpression extends AbstractExpression
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         foreach ($this->alternatives as $alternative) {
-            $result = $alternative->match($context, $offset);
+            $result = $context->matchExpression($alternative, $offset);
             if ($result !== null) {
                 return $result;
             }

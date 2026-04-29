@@ -12,6 +12,7 @@ use EmanueleCoppola\PHPeg\Expression\ChoiceExpression;
 use EmanueleCoppola\PHPeg\Expression\EndOfInputExpression;
 use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
 use EmanueleCoppola\PHPeg\Expression\LiteralExpression;
+use EmanueleCoppola\PHPeg\Expression\LakeExpression;
 use EmanueleCoppola\PHPeg\Expression\NotPredicateExpression;
 use EmanueleCoppola\PHPeg\Expression\OneOrMoreExpression;
 use EmanueleCoppola\PHPeg\Expression\OptionalExpression;
@@ -164,6 +165,14 @@ class GrammarBuilder
     public function eof(): ExpressionInterface
     {
         return new EndOfInputExpression();
+    }
+
+    /**
+     * Creates a lake expression that captures water up to the compiled stop set.
+     */
+    public function lake(?string $name = null, bool $capture = true): ExpressionInterface
+    {
+        return new LakeExpression($name, $capture);
     }
 
     /**

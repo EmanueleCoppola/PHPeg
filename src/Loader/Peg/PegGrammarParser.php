@@ -128,6 +128,14 @@ class PegGrammarParser
             return $this->builder->ref($this->previous()->lexeme);
         }
 
+        if ($this->match('TILDE')) {
+            return $this->parseLakeExpression();
+        }
+
+        if ($this->match('LT')) {
+            return $this->parseLakeExpression();
+        }
+
         if ($this->match('LPAREN')) {
             $expression = $this->parseExpression();
             $this->consume('RPAREN', 'Expected ")" after grouped expression.');
@@ -136,6 +144,27 @@ class PegGrammarParser
         }
 
         throw new InvalidArgumentException(sprintf('Unexpected token "%s" in PEG expression.', $this->peek()->type));
+    }
+
+    /**
+     * Parses a lake expression in `~`, `<Name>`, or `<>` form.
+     */
+    private function parseLakeExpression(): ExpressionInterface
+    {
+        if ($this->previous()->type === 'TILDE') {
+            return $this->builder->lake();
+        }
+
+        if ($this->check('GT')) {
+            $this->consume('GT', 'Expected ">" to close unnamed lake.');
+
+            return $this->builder->lake();
+        }
+
+        $name = $this->consume('IDENT', 'Expected lake name after "<".')->lexeme;
+        $this->consume('GT', 'Expected ">" after lake name.');
+
+        return $this->builder->lake($name);
     }
 
     private function isRuleStart(): bool

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EmanueleCoppola\PHPeg\Tests\Loader\CleanPeg;
 
+use EmanueleCoppola\PHPeg\Expression\LakeExpression;
 use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarParser;
 use PHPUnit\Framework\TestCase;
 
@@ -14,9 +15,10 @@ class CleanPegGrammarParserTest extends TestCase
      */
     public function testParsesCleanPegSource(): void
     {
-        $grammar = CleanPegGrammarParser::parse("Start = \"a\"\n", 'Start', null);
+        $grammar = CleanPegGrammarParser::parse("Start = \"{\" <BodyWater> \"}\"\n", 'Start', null);
 
         self::assertSame('Start', $grammar->startRule());
-        self::assertTrue($grammar->parse('a')->isSuccess());
+        self::assertTrue($grammar->parse('{abc}')->isSuccess());
+        self::assertInstanceOf(LakeExpression::class, $grammar->rule('Start')?->expression()->expressions()[1] ?? null);
     }
 }

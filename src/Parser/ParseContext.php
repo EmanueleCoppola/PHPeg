@@ -6,7 +6,12 @@ namespace EmanueleCoppola\PHPeg\Parser;
 
 use EmanueleCoppola\PHPeg\Error\ParseError;
 use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Expression\LakeExpression;
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Lake\LakeMatcher;
+use EmanueleCoppola\PHPeg\Lake\LakePlan;
+use EmanueleCoppola\PHPeg\Lake\LakePlanCache;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
@@ -43,6 +48,23 @@ class ParseContext
      */
     private array $emptyMatches = [];
 
+    /**
+     * @var array<string, MatchResult|null>
+     */
+    private array $expressionMemo = [];
+
+    /**
+     * @var list<string>
+     */
+    private array $expressionMemoOrder = [];
+
+    private int $failureSuppressionDepth = 0;
+
+    /**
+     * @var list<array<int, int>>
+     */
+    private array $bannedLakeIdStack = [];
+
     private readonly bool $memoizationEnabled;
 
     private readonly bool $optimizeErrors;
@@ -50,6 +72,8 @@ class ParseContext
     private readonly bool $reuseEmptyMatches;
 
     private readonly ?int $maxCacheEntries;
+
+    private readonly LakePlan $lakePlan;
 
     public function __construct(
         private readonly Grammar $grammar,
@@ -60,6 +84,7 @@ class ParseContext
         $this->optimizeErrors = $options->optimizeErrors();
         $this->reuseEmptyMatches = $options->reuseEmptyMatches();
         $this->maxCacheEntries = $options->maxCacheEntries();
+        $this->lakePlan = LakePlanCache::forGrammar($grammar);
     }
 
     /**
@@ -84,6 +109,58 @@ class ParseContext
     public function options(): ParserOptions
     {
         return $this->options;
+    }
+
+    /**
+     * Returns the compiled lake plan for this grammar.
+     */
+    public function lakePlan(): LakePlan
+    {
+        return $this->lakePlan;
+    }
+
+    /**
+     * Matches an arbitrary expression with memoization.
+     */
+    public function matchExpression(ExpressionInterface $expression, int $offset): ?MatchResult
+    {
+        return $this->matchExpressionInternal($expression, $offset);
+    }
+
+    /**
+     * Matches an arbitrary expression without recording failures.
+     */
+    public function matchExpressionSilently(ExpressionInterface $expression, int $offset): ?MatchResult
+    {
+        $this->failureSuppressionDepth++;
+        try {
+            return $this->matchExpressionInternal($expression, $offset);
+        } finally {
+            $this->failureSuppressionDepth--;
+        }
+    }
+
+    /**
+     * Matches a lake expression using the compiled lake plan.
+     */
+    public function matchLakeExpression(LakeExpression $lake, int $offset): ?MatchResult
+    {
+        return LakeMatcher::match($this, $lake, $offset);
+    }
+
+    /**
+     * Runs a callback with one or more lake ids temporarily banned.
+     *
+     * @param array<int, int> $bannedLakeIds
+     */
+    public function withBannedLakeIds(array $bannedLakeIds, callable $callback): mixed
+    {
+        $this->bannedLakeIdStack[] = $bannedLakeIds;
+        try {
+            return $callback();
+        } finally {
+            array_pop($this->bannedLakeIdStack);
+        }
     }
 
     /**
@@ -131,6 +208,10 @@ class ParseContext
      */
     public function recordFailure(int $offset, string $expected): void
     {
+        if ($this->failureSuppressionDepth > 0) {
+            return;
+        }
+
         if ($offset > $this->furthestOffset) {
             $this->furthestOffset = $offset;
             if ($this->optimizeErrors) {
@@ -215,5 +296,113 @@ class ParseContext
                 unset($this->memo[$entry['rule']]);
             }
         }
+    }
+
+    /**
+     * Applies the configured expression memoization limit.
+     */
+    private function trimExpressionMemo(): void
+    {
+        if ($this->maxCacheEntries === null) {
+            return;
+        }
+
+        while (count($this->expressionMemoOrder) > $this->maxCacheEntries) {
+            $key = array_shift($this->expressionMemoOrder);
+            if ($key === null) {
+                return;
+            }
+
+            unset($this->expressionMemo[$key]);
+        }
+    }
+
+    /**
+     * Matches an expression with memoization and lake-ban awareness.
+     */
+    private function matchExpressionInternal(ExpressionInterface $expression, int $offset): ?MatchResult
+    {
+        $cacheKey = null;
+        if ($this->memoizationEnabled) {
+            $cacheKey = $this->expressionMemoKey($expression, $offset);
+            if (array_key_exists($cacheKey, $this->expressionMemo)) {
+                return $this->expressionMemo[$cacheKey];
+            }
+        }
+
+        if ($expression instanceof LakeExpression && $this->isLakeBanned($expression, $offset)) {
+            if ($this->memoizationEnabled && $cacheKey !== null) {
+                $this->expressionMemo[$cacheKey] = null;
+                $this->expressionMemoOrder[] = $cacheKey;
+                $this->trimExpressionMemo();
+            }
+
+            return null;
+        }
+
+        if (!$this->memoizationEnabled) {
+            return $this->matchExpressionDirect($expression, $offset);
+        }
+
+        $result = $this->matchExpressionDirect($expression, $offset);
+        $this->expressionMemo[$cacheKey] = $result;
+        $this->expressionMemoOrder[] = $cacheKey;
+        $this->trimExpressionMemo();
+
+        return $result;
+    }
+
+    /**
+     * Matches an expression without consulting the memoized cache.
+     */
+    private function matchExpressionDirect(ExpressionInterface $expression, int $offset): ?MatchResult
+    {
+        return $expression->match($this, $offset);
+    }
+
+    /**
+     * Returns whether the current stop-match context bans the provided lake.
+     */
+    private function isLakeBanned(LakeExpression $lake, int $offset): bool
+    {
+        $lakeId = spl_object_id($lake);
+
+        for ($index = count($this->bannedLakeIdStack) - 1; $index >= 0; $index--) {
+            if (($this->bannedLakeIdStack[$index][$lakeId] ?? null) === $offset) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Builds a memoization key that includes the active lake-ban signature.
+     */
+    private function expressionMemoKey(ExpressionInterface $expression, int $offset): string
+    {
+        return $this->bannedLakeSignature() . '|' . spl_object_id($expression) . '|' . $offset;
+    }
+
+    /**
+     * Returns a stable signature for the currently banned lake ids.
+     */
+    private function bannedLakeSignature(): string
+    {
+        if ($this->bannedLakeIdStack === []) {
+            return '0';
+        }
+
+        $ids = [];
+        foreach ($this->bannedLakeIdStack as $frame) {
+            foreach ($frame as $lakeId => $originOffset) {
+                $ids[$lakeId . '@' . $originOffset] = true;
+            }
+        }
+
+        $keys = array_map('strval', array_keys($ids));
+        sort($keys);
+
+        return implode(',', $keys);
     }
 }

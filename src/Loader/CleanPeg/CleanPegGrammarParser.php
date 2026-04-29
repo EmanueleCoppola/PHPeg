@@ -141,6 +141,14 @@ class CleanPegGrammarParser
             return $this->wrapSkippable($this->builder->ref($name));
         }
 
+        if ($this->match('TILDE')) {
+            return $this->wrapSkippable($this->parseLakeExpression());
+        }
+
+        if ($this->match('LT')) {
+            return $this->wrapSkippable($this->parseLakeExpression());
+        }
+
         if ($this->match('LPAREN')) {
             $expression = $this->parseExpression();
             $this->consume('RPAREN', 'expected ")" after grouped expression');
@@ -167,11 +175,32 @@ class CleanPegGrammarParser
             return true;
         }
 
-        if ($this->check('IDENT')) {
+        if ($this->check('IDENT') || $this->check('TILDE') || $this->check('LT')) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Parses a lake expression in `~`, `<Name>`, or `<>` form.
+     */
+    private function parseLakeExpression(): ExpressionInterface
+    {
+        if ($this->previous()->type === 'TILDE') {
+            return $this->builder->lake();
+        }
+
+        if ($this->check('GT')) {
+            $this->consume('GT', 'expected ">" to close unnamed lake');
+
+            return $this->builder->lake();
+        }
+
+        $name = $this->consume('IDENT', 'expected lake name after "<"')->lexeme;
+        $this->consume('GT', 'expected ">" after lake name');
+
+        return $this->builder->lake($name);
     }
 
     private function consumeNewlines(): void

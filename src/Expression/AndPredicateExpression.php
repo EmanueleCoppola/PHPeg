@@ -27,7 +27,7 @@ class AndPredicateExpression extends AbstractExpression
 
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
-        return $this->expression->match($context, $offset) !== null ? $context->emptyMatch($offset) : null;
+        return $context->matchExpressionSilently($this->expression, $offset) !== null ? $context->emptyMatch($offset) : null;
     }
 
     public function describe(): string

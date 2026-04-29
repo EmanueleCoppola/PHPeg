@@ -34,7 +34,7 @@ class SequenceExpression extends AbstractExpression
         $cursor = $offset;
 
         foreach ($this->expressions as $expression) {
-            $result = $expression->match($context, $cursor);
+            $result = $context->matchExpression($expression, $cursor);
             if ($result === null) {
                 return null;
             }

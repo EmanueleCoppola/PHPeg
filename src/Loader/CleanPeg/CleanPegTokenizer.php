@@ -56,7 +56,7 @@ class CleanPegTokenizer
             $line = $this->line;
             $column = $this->column;
 
-            if ($char === '=' || $char === '/' || $char === '?' || $char === '*' || $char === '+' || $char === '(' || $char === ')') {
+            if ($char === '=' || $char === '/' || $char === '?' || $char === '*' || $char === '+' || $char === '(' || $char === ')' || $char === '~' || $char === '<' || $char === '>') {
                 $this->advance();
                 $tokens[] = new CleanPegToken([
                     '=' => 'EQUAL',
@@ -66,6 +66,9 @@ class CleanPegTokenizer
                     '+' => 'PLUS',
                     '(' => 'LPAREN',
                     ')' => 'RPAREN',
+                    '~' => 'TILDE',
+                    '<' => 'LT',
+                    '>' => 'GT',
                 ][$char], $char, $line, $column);
                 continue;
             }
