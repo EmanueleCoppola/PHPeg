@@ -1,6 +1,27 @@
 # Grammar Reference
 
-This directory documents the three supported grammar definition styles in PHPPeg.
+This directory documents the three supported grammar definition styles in PHPeg.
+
+## When To Use What
+
+- Use the **Fluent PHP Builder** when the grammar lives in application code and you want to build it programmatically in PHP.
+- Use the **Classic PEG Loader** when you already have PEG grammars or want the most explicit, traditional notation.
+- Use the **CleanPeg Loader** when you want a compact grammar format with less boilerplate and are fine with loader conveniences.
+
+Practical differences:
+
+- **Fluent PHP Builder**
+  - you write PHP code, not grammar text
+  - you get full control over expressions and composition
+  - nothing is injected automatically by a loader
+- **Classic PEG Loader**
+  - `EOF` is not built in, so you usually define it yourself
+  - whitespace is not skipped automatically
+  - you get the closest fit to traditional PEG notation
+- **CleanPeg Loader**
+  - `EOF` is built in
+  - whitespace is skipped automatically by default
+  - the syntax is shorter, but the loader adds convenience behavior
 
 ## Pages
 

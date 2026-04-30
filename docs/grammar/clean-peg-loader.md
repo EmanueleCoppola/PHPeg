@@ -10,7 +10,7 @@ Use CleanPeg when:
 
 - you want grammar definitions in a compact text format
 - you want a loader that is still easy to read in reviews
-- you want a lightweight syntax without giving up the PHPPeg AST runtime
+- you want a lightweight syntax without giving up the PHPeg AST runtime
 
 ## Loader API
 
@@ -116,6 +116,48 @@ list = item*
 start = expression EOF
 ```
 
+## Lake Nodes
+
+Lake nodes are the island-parsing primitive in PHPeg.
+
+Use `~` or `<>` to mark an unnamed lake:
+
+```cleanpeg
+body = "{" ~ "}"
+alt_body = "{" <> "}"
+```
+
+Use `<Name>` to give the lake node a name:
+
+```cleanpeg
+named = "{" <BodyWater> "}"
+```
+
+`~` and `<>` are equivalent for unnamed lakes.
+
+Lake nodes consume water until the next valid continuation in the grammar. That lets you describe only the interesting islands and leave the surrounding text as generic water.
+
+Practical effects:
+
+- the unnamed lake node is named `Lake`
+- a named lake node uses the provided name, such as `BodyWater`
+- unchanged documents still print back byte-for-byte identical
+- lake nodes can be queried like regular AST nodes
+
+Example:
+
+```cleanpeg
+Program = (Function / ~) * EOF
+Function = "function" Spacing Identifier Spacing "(" <> ")" Spacing Block
+Block = "{" ~ "}"
+```
+
+In that grammar, the top-level lake stops before `function` or EOF, the parameter lake stops before `)`, and the block lake stops before `}`.
+
+Lake nodes are especially useful for island parsing, partial grammars, and source-preserving editing of documents that contain a lot of irrelevant text.
+
+If you want to read more about the idea behind lake nodes, see [docs/lake-symbols.md](../lake-symbols.md).
+
 ### Comments
 
 Line comments start with `#`.
@@ -173,7 +215,7 @@ CleanPeg compiles to the same runtime model as the builder.
 
 ## Practical Notes
 
-- Use CleanPeg for compact grammars that still need the full PHPPeg AST runtime.
+- Use CleanPeg for compact grammars that still need the full PHPeg AST runtime.
 - Use `EOF` explicitly when you want full-input matching.
 - Disable whitespace skipping when token boundaries matter.
 - Keep inserted nodes explicit when you plan to print a modified document.

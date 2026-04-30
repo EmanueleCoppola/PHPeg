@@ -1,6 +1,6 @@
 # Classic PEG Loader
 
-The classic PEG loader reads traditional PEG syntax and compiles it into the same PHPPeg runtime model used by the builder and CleanPeg loader.
+The classic PEG loader reads traditional PEG syntax and compiles it into the same PHPeg runtime model used by the builder and CleanPeg loader.
 
 Use it when you already have PEG grammar files or you want a traditional grammar notation in a repository.
 
@@ -124,6 +124,48 @@ Predicates do not consume input.
 ```peg
 any <- .
 ```
+
+### Lake Nodes
+
+Lake nodes are the island-parsing primitive in PHPeg.
+
+Use `~` or `<>` to mark an unnamed lake:
+
+```peg
+Body <- "{" ~ "}"
+AltBody <- "{" <> "}"
+```
+
+Use `<Name>` to give the lake node a name:
+
+```peg
+Named <- "{" <BodyWater> "}"
+```
+
+`~` and `<>` are equivalent for unnamed lakes.
+
+Lake nodes consume water until the next valid continuation in the grammar. That lets you describe only the interesting islands and leave the surrounding text as generic water.
+
+Practical effects:
+
+- the unnamed lake node is named `Lake`
+- a named lake node uses the provided name, such as `BodyWater`
+- unchanged documents still print back byte-for-byte identical
+- lake nodes can be queried like regular AST nodes
+
+Example:
+
+```peg
+Program <- (Function / ~)*
+Function <- "function" Spacing Identifier Spacing "(" <> ")" Spacing Block
+Block <- "{" ~ "}"
+```
+
+In that grammar, the top-level lake stops before `function` or EOF, the parameter lake stops before `)`, and the block lake stops before `}`.
+
+Lake nodes are especially useful for island parsing, partial grammars, and source-preserving editing of documents that contain a lot of irrelevant text.
+
+If you want to read more about the idea behind lake nodes, see [docs/lake-symbols.md](../lake-symbols.md).
 
 ### Comments
 

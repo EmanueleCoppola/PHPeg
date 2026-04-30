@@ -1,6 +1,6 @@
 # Fluent PHP Builder
 
-The fluent PHP builder is the most direct way to define a grammar in PHPPeg.
+The fluent PHP builder is the most direct way to define a grammar in PHPeg.
 It keeps the grammar in native PHP code and compiles it into the same immutable `Grammar` model used by the loaders.
 
 ## When To Use It
@@ -56,6 +56,7 @@ If you do not call `grammar()`, the first rule you add becomes the start rule.
 - `eof(): ExpressionInterface`
 - `and(ExpressionInterface $expression): ExpressionInterface`
 - `not(ExpressionInterface $expression): ExpressionInterface`
+- `lake(?string $name = null, bool $capture = true): ExpressionInterface`
 
 ### Aliases
 
@@ -182,6 +183,55 @@ $g->not($g->literal(')'));
 Predicates do not consume input. They only test whether the wrapped expression would match.
 
 Use them with any single `ExpressionInterface`, usually a literal, reference, or short sequence.
+
+### `lake()`
+
+Creates a lake expression for island parsing.
+
+```php
+$g->lake();
+$g->lake('BodyWater');
+```
+
+Lake nodes are the island-parsing primitive in PHPeg.
+
+`lake()` creates an unnamed lake node by default, which is named `Lake` in the AST.
+Passing a string name creates a named lake node, such as `BodyWater`.
+
+When you write the same idea in a loader grammar, use `~` or `<>` for an unnamed lake and `<Name>` for a named lake.
+
+Lake nodes consume water until the compiled stop set is reached. That makes them useful when you want to describe only the interesting islands in a larger document and leave the surrounding text untouched.
+
+Practical effects:
+
+- the unnamed lake node is named `Lake`
+- a named lake node uses the provided name
+- unchanged documents still print back byte-for-byte identical
+- lake nodes can be queried like regular AST nodes
+
+Example:
+
+```php
+$grammar = $g->grammar('Program')
+    ->rule('Program', $g->seq($g->zeroOrMore($g->choice($g->ref('Function'), $g->lake())), $g->eof()))
+    ->rule('Function', $g->seq(
+        $g->literal('function'),
+        $g->ref('Spacing'),
+        $g->ref('Identifier'),
+        $g->ref('Spacing'),
+        $g->literal('('),
+        $g->lake(),
+        $g->literal(')'),
+        $g->ref('Spacing'),
+        $g->ref('Block'),
+    ))
+    ->rule('Block', $g->seq($g->literal('{'), $g->lake(), $g->literal('}')))
+    ->build();
+```
+
+In that grammar, the top-level lake stops before `function` or EOF, the parameter lake stops before `)`, and the block lake stops before `}`.
+
+If you want to read more about the idea behind lake nodes, see [docs/lake-symbols.md](../lake-symbols.md).
 
 ## Example Grammar
 
