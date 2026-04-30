@@ -116,6 +116,174 @@ class ParseCommandTest extends TestCase
     }
 
     /**
+     * Verifies the command can write a DOT parse tree file while still emitting JSON to stdout.
+     */
+    public function testWritesDotParseTreeToAFile(): void
+    {
+        [$grammarPath, $inputPath] = $this->createCompactLakeFixture();
+        $treeOutputPath = tempnam(sys_get_temp_dir(), 'phpeg-tree-');
+        if ($treeOutputPath === false) {
+            self::fail('Unable to create a temporary tree output file.');
+        }
+
+        unlink($treeOutputPath);
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $inputPath,
+            '--grammar-format=cleanpeg',
+            '--tree-format=dot',
+            '--tree-output=' . $treeOutputPath,
+            '--json-style=simple',
+        ]);
+
+        self::assertSame(0, $exitCode, $stderr);
+        self::assertFileExists($treeOutputPath);
+
+        /** @var array<string, mixed> $payload */
+        $payload = json_decode($stdout, true, 512, JSON_THROW_ON_ERROR);
+        self::assertTrue($payload['success']);
+        self::assertStringContainsString('digraph ParseTree {', (string) file_get_contents($treeOutputPath));
+        $dot = (string) file_get_contents($treeOutputPath);
+        self::assertStringContainsString('  n1 [label="Start\\n0..19\\nbefore middle after", style="rounded,filled", color="#3b82f6", fillcolor="#eff6ff", fontcolor="#1e3a8a"];', $dot);
+        self::assertStringContainsString('  n2 [label="Lake\\n7..13\\nmiddle", style="dashed,rounded,filled", color="#2563eb", fillcolor="#dbeafe", fontcolor="#1e3a8a"];', $dot);
+
+        @unlink($grammarPath);
+        @unlink($inputPath);
+        @unlink($treeOutputPath);
+    }
+
+    /**
+     * Verifies unsupported tree formats render a clean CLI error.
+     */
+    public function testFailsWhenTreeFormatIsUnsupported(): void
+    {
+        [$grammarPath, $inputPath] = $this->createCompactLakeFixture();
+        $treeOutputPath = tempnam(sys_get_temp_dir(), 'phpeg-tree-');
+        if ($treeOutputPath === false) {
+            self::fail('Unable to create a temporary tree output file.');
+        }
+
+        unlink($treeOutputPath);
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $inputPath,
+            '--grammar-format=cleanpeg',
+            '--tree-format=svg',
+            '--tree-output=' . $treeOutputPath,
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Unsupported tree format "svg". Use "dot".', $stdout);
+        self::assertFileDoesNotExist($treeOutputPath);
+
+        @unlink($grammarPath);
+        @unlink($inputPath);
+    }
+
+    /**
+     * Verifies tree output is rejected when the output path is missing.
+     */
+    public function testFailsWhenTreeOutputIsMissing(): void
+    {
+        [$grammarPath, $inputPath] = $this->createCompactLakeFixture();
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $inputPath,
+            '--grammar-format=cleanpeg',
+            '--tree-format=dot',
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Pass --tree-output=path/to/tree.dot when using --tree-format=dot.', $stdout);
+
+        @unlink($grammarPath);
+        @unlink($inputPath);
+    }
+
+    /**
+     * Verifies tree output is rejected when the format is missing.
+     */
+    public function testFailsWhenTreeFormatIsMissing(): void
+    {
+        [$grammarPath, $inputPath] = $this->createCompactLakeFixture();
+        $treeOutputPath = tempnam(sys_get_temp_dir(), 'phpeg-tree-');
+        if ($treeOutputPath === false) {
+            self::fail('Unable to create a temporary tree output file.');
+        }
+
+        unlink($treeOutputPath);
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $inputPath,
+            '--grammar-format=cleanpeg',
+            '--tree-output=' . $treeOutputPath,
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Pass --tree-format=dot when using --tree-output.', $stdout);
+
+        @unlink($grammarPath);
+        @unlink($inputPath);
+        @unlink($treeOutputPath);
+    }
+
+    /**
+     * Verifies a parsing failure does not write a DOT file.
+     */
+    public function testParseFailureDoesNotWriteDotFile(): void
+    {
+        [$grammarPath, $inputPath] = $this->createCompactLakeFixture();
+        $treeOutputPath = tempnam(sys_get_temp_dir(), 'phpeg-tree-');
+        if ($treeOutputPath === false) {
+            self::fail('Unable to create a temporary tree output file.');
+        }
+
+        unlink($treeOutputPath);
+        file_put_contents($inputPath, 'before middle');
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $inputPath,
+            '--grammar-format=cleanpeg',
+            '--tree-format=dot',
+            '--tree-output=' . $treeOutputPath,
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertFileDoesNotExist($treeOutputPath);
+
+        @unlink($grammarPath);
+        @unlink($inputPath);
+    }
+
+    /**
      * Verifies the command fails when required grammar input is missing.
      */
     public function testFailsWhenGrammarFlagIsMissing(): void
