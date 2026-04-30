@@ -8,6 +8,7 @@ return [
     'add' => [
         EmanueleCoppola\PHPeg\App\Commands\BenchmarkCommand::class,
         EmanueleCoppola\PHPeg\App\Commands\BenchmarkCompareCommand::class,
+        EmanueleCoppola\PHPeg\App\Commands\ParseCommand::class,
     ],
     'hidden' => [],
     'remove' => [],
