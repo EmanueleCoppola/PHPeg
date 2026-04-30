@@ -266,6 +266,24 @@ class AstNode
     }
 
     /**
+     * Returns the explicit attribute map stored on the node.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Returns whether the node represents a lake capture.
+     */
+    public function isLake(): bool
+    {
+        return ($this->attributes['kind'] ?? null) === 'lake';
+    }
+
+    /**
      * Adds a node as the first logical child.
      */
     public function prependNode(AstNode $node): self
