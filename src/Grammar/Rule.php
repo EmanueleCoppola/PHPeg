@@ -16,10 +16,13 @@ class Rule
 {
     /**
      * Initializes a new Rule instance.
+     *
+     * @param bool $isWater Marks the rule as water for lake matching.
      */
     public function __construct(
         private readonly string $name,
         private readonly ExpressionInterface $expression,
+        private readonly bool $isWater = false,
     ) {
     }
 
@@ -40,6 +43,14 @@ class Rule
     }
 
     /**
+     * Returns whether this rule is annotated as water.
+     */
+    public function isWater(): bool
+    {
+        return $this->isWater;
+    }
+
+    /**
      * Matches this rule and wraps the resulting subtree into an AST node.
      */
     public function match(ParseContext $context, int $offset): ?MatchResult
@@ -55,6 +66,7 @@ class Rule
             $offset,
             $result->endOffset(),
             $result->nodes(),
+            $this->isWater ? ['kind' => 'water'] : [],
             sourceBuffer: $context->options()->lazyNodeText() ? $context->input() : null,
         );
 

@@ -279,17 +279,21 @@ class ParseCommand extends Command
      */
     private function renderParseFailure(string $grammarPath, string $inputPath, string $grammarFormat, ?string $startRule, ?ParseError $error): void
     {
-        $this->error('ERROR');
-        $this->line($error?->message() ?? 'Unable to parse input.');
-        $this->line('');
-        $this->line('Context:');
-        $this->line(sprintf('  grammar: %s', $grammarPath));
-        $this->line(sprintf('  input: %s', $inputPath));
-        $this->line(sprintf('  format: %s', $grammarFormat));
+        $lines = [
+            'ERROR',
+            $error?->message() ?? 'Unable to parse input.',
+            '',
+            'Context:',
+            sprintf('grammar: %s', $grammarPath),
+            sprintf('input: %s', $inputPath),
+            sprintf('format: %s', $grammarFormat),
+        ];
 
         if ($startRule !== null) {
-            $this->line(sprintf('  start rule: %s', $startRule));
+            $lines[] = sprintf('start rule: %s', $startRule);
         }
+
+        $this->renderErrorBox($lines);
     }
 
     /**
@@ -297,14 +301,41 @@ class ParseCommand extends Command
      */
     private function renderCliError(Throwable $throwable): void
     {
-        $this->error('ERROR');
-        $this->line($this->friendlyErrorMessage($throwable));
+        $lines = [
+            'ERROR',
+            $this->friendlyErrorMessage($throwable),
+        ];
 
         $hint = $this->friendlyErrorHint($throwable);
         if ($hint !== null) {
-            $this->line('');
-            $this->line('Hint: ' . $hint);
+            $lines[] = '';
+            $lines[] = 'Hint: ' . $hint;
         }
+
+        $this->renderErrorBox($lines);
+    }
+
+    /**
+     * Renders a boxed error message to the CLI.
+     *
+     * @param list<string> $lines
+     */
+    private function renderErrorBox(array $lines): void
+    {
+        $width = 0;
+
+        foreach ($lines as $line) {
+            $width = max($width, strlen($line));
+        }
+
+        $border = '+' . str_repeat('-', $width + 2) . '+';
+        $this->line($border);
+
+        foreach ($lines as $line) {
+            $this->line(sprintf('| %-'. $width . 's |', $line));
+        }
+
+        $this->line($border);
     }
 
     /**

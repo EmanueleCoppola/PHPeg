@@ -53,6 +53,30 @@ class LakeNodesTest extends TestCase
     }
 
     /**
+     * Verifies a named lake can use a local water profile instead of the global fallback.
+     */
+    public function testNamedLakeUsesLocalWaterProfile(): void
+    {
+        $g = GrammarBuilder::create();
+        $grammar = $g
+            ->lakeRule('BodyWater', $g->regex('[^{}]+'))
+            ->grammar('Program')
+            ->rule('Program', $g->seq($g->literal('{'), $g->lake('BodyWater'), $g->literal('}')))
+            ->rule('Whitespace', $g->regex('[ \t\r\n]+'), true)
+            ->build();
+
+        $document = $grammar->parseDocument('{foo bar}');
+        $lake = $document->query('BodyWater[kind="lake"]:first')->first();
+        $water = $document->query('BodyWater[kind="water"]:first')->first();
+
+        self::assertNotNull($lake);
+        self::assertNotNull($water);
+        self::assertSame('foo bar', $lake?->text());
+        self::assertSame('foo bar', $water?->text());
+        self::assertSame(1, $document->query('BodyWater[kind="water"]')->count());
+    }
+
+    /**
      * Verifies a lake before EOF consumes the entire trailing input.
      */
     public function testLakeBeforeEofConsumesToEnd(): void

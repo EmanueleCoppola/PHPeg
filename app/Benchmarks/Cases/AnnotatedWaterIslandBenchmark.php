@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\App\Benchmarks\Cases;
 
 /**
- * Measures the same island parsing problem with a hand-written water rule.
+ * Measures island parsing with water rules marked by annotations.
  */
-class ManualWaterIslandBenchmark extends AbstractIslandBenchmark
+class AnnotatedWaterIslandBenchmark extends AbstractIslandBenchmark
 {
     /**
      * @inheritDoc
      */
     public function name(): string
     {
-        return 'Island parsing with manual water';
+        return 'Island parsing with annotated water';
     }
 
     /**
@@ -22,7 +22,7 @@ class ManualWaterIslandBenchmark extends AbstractIslandBenchmark
      */
     public function slug(): string
     {
-        return 'manual-water-island';
+        return 'annotated-water-island';
     }
 
     /**
@@ -44,9 +44,20 @@ class ManualWaterIslandBenchmark extends AbstractIslandBenchmark
     protected function grammarSource(string $scale): string
     {
         return <<<'CLEANPEG'
-Program = (Block / Water)* EOF
-Block = "{" (Block / Water)* "}"
-Water = r'[^{}]+'
+Program = (Block / ~)* EOF
+Block = "{" (Block / ~)* "}"
+@water
+Comment = r'//[^\n]*(?:\n|$)'
+@water
+String = r'"(?:\\.|[^"])*"'
+@water
+Word = r'[A-Za-z_][A-Za-z0-9_]*'
+@water
+Number = r'\d+'
+@water
+Whitespace = r'[ \t\r\n]+'
+@water
+Punctuation = r'[=;:,./-]+'
 Start = Program
 CLEANPEG;
     }

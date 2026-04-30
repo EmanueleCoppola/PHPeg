@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\Lake;
 
 use EmanueleCoppola\PHPeg\Ast\AstNode;
+use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
 use EmanueleCoppola\PHPeg\Expression\LakeExpression;
 use EmanueleCoppola\PHPeg\Parser\ParseContext;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
@@ -27,8 +28,11 @@ class LakeMatcher
             return null;
         }
 
+        $waterProfile = $lake->name() === null ? null : $context->grammar()->lakeProfile($lake->name());
+        $waterRules = $waterProfile === null ? $context->grammar()->waterRules() : [];
         $cursor = $offset;
         $length = $context->input()->length();
+        $children = [];
 
         while ($cursor <= $length) {
             foreach ($sequences as $sequence) {
@@ -42,12 +46,32 @@ class LakeMatcher
                 );
 
                 if ($result !== null) {
-                    return self::buildResult($context, $lake, $offset, $cursor);
+                    return self::buildResult($context, $lake, $offset, $cursor, $children);
                 }
             }
 
             if ($cursor === $length) {
                 break;
+            }
+
+            if ($waterProfile !== null) {
+                $result = self::matchWaterExpression($context, $lake->name() ?? 'Lake', $waterProfile, $cursor);
+                if ($result !== null) {
+                    array_push($children, ...$result->nodes());
+                    $cursor = $result->endOffset();
+                    continue;
+                }
+            }
+
+            foreach ($waterRules as $waterRule) {
+                $result = $context->matchRuleSilently($waterRule->name(), $cursor);
+                if ($result === null || $result->endOffset() === $cursor) {
+                    continue;
+                }
+
+                array_push($children, ...$result->nodes());
+                $cursor = $result->endOffset();
+                continue 2;
             }
 
             $cursor++;
@@ -62,9 +86,36 @@ class LakeMatcher
     }
 
     /**
-     * Builds the AST result for a matched lake.
+     * Matches a lake-specific water expression and wraps it into a water node.
      */
-    private static function buildResult(ParseContext $context, LakeExpression $lake, int $startOffset, int $endOffset): MatchResult
+    private static function matchWaterExpression(ParseContext $context, string $name, ExpressionInterface $expression, int $offset): ?MatchResult
+    {
+        $result = $context->matchExpressionSilently($expression, $offset);
+        if ($result === null || $result->endOffset() === $offset) {
+            return null;
+        }
+
+        $node = new AstNode(
+            $name,
+            $context->options()->lazyNodeText() ? null : $context->input()->slice($offset, $result->endOffset()),
+            $offset,
+            $result->endOffset(),
+            $result->nodes(),
+            ['kind' => 'water'],
+            true,
+            null,
+            $context->options()->lazyNodeText() ? $context->input() : null,
+        );
+
+        return new MatchResult($offset, $result->endOffset(), [$node]);
+    }
+
+    /**
+     * Builds the AST result for a matched lake.
+     *
+     * @param list<AstNode> $children
+     */
+    private static function buildResult(ParseContext $context, LakeExpression $lake, int $startOffset, int $endOffset, array $children): MatchResult
     {
         if (!$lake->capture()) {
             return new MatchResult($startOffset, $endOffset);
@@ -75,7 +126,7 @@ class LakeMatcher
             $context->options()->lazyNodeText() ? null : $context->input()->slice($startOffset, $endOffset),
             $startOffset,
             $endOffset,
-            [],
+            $children,
             ['kind' => 'lake'],
             true,
             null,

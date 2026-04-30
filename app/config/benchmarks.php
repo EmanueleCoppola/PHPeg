@@ -11,5 +11,6 @@ return [
         EmanueleCoppola\PHPeg\App\Benchmarks\Cases\BacktrackingHeavyBenchmark::class,
         EmanueleCoppola\PHPeg\App\Benchmarks\Cases\LakeIslandBenchmark::class,
         EmanueleCoppola\PHPeg\App\Benchmarks\Cases\ManualWaterIslandBenchmark::class,
+        EmanueleCoppola\PHPeg\App\Benchmarks\Cases\AnnotatedWaterIslandBenchmark::class,
     ],
 ];

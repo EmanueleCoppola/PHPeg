@@ -43,11 +43,21 @@ class PegGrammarParser
     {
         $firstRule = null;
         while (!$this->check('EOF')) {
+            if ($this->isLakeDeclarationStart()) {
+                $this->parseLakeDeclaration();
+                continue;
+            }
+
+            $annotations = $this->parseAnnotations();
             $name = $this->consume('IDENT', 'Expected rule name.')->lexeme;
             $this->consume('ARROW', 'Expected "<-" after rule name.');
             $expression = $this->parseExpression();
-            $this->builder->rule($name, $expression);
-            $firstRule ??= $name;
+            if ($annotations['lake']) {
+                $this->builder->lakeRule($name, $expression);
+            } else {
+                $this->builder->rule($name, $expression, $annotations['water']);
+                $firstRule ??= $name;
+            }
         }
 
         if ($firstRule === null) {
@@ -57,6 +67,52 @@ class PegGrammarParser
         $this->builder->grammar($firstRule);
 
         return $this->builder->build();
+    }
+
+    /**
+     * Parses optional `@water` annotations before a rule definition.
+     *
+     * @return array{water: bool, lake: bool}
+     */
+    private function parseAnnotations(): array
+    {
+        $isWater = false;
+        $isLake = false;
+
+        while ($this->match('AT')) {
+            $annotation = $this->consume('IDENT', 'Expected annotation name after "@".')->lexeme;
+            if ($annotation === 'water') {
+                $isWater = true;
+                continue;
+            }
+
+            if ($annotation === 'lake') {
+                $isLake = true;
+                continue;
+            }
+
+            throw new InvalidArgumentException(sprintf('Unsupported PEG annotation "@%s".', $annotation));
+        }
+
+        if ($isWater && $isLake) {
+            throw new InvalidArgumentException('PEG annotations "@water" and "@lake" cannot be combined on the same rule.');
+        }
+
+        return ['water' => $isWater, 'lake' => $isLake];
+    }
+
+    /**
+     * Parses a named lake profile declaration in the form `<Name> <- expression`.
+     */
+    private function parseLakeDeclaration(): void
+    {
+        $this->consume('LT', 'Expected "<" at the beginning of a lake declaration.');
+        $name = $this->consume('IDENT', 'Expected lake name after "<".')->lexeme;
+        $this->consume('GT', 'Expected ">" after lake name.');
+        $this->consume('ARROW', 'Expected "<-" after lake name.');
+        $expression = $this->parseExpression();
+
+        $this->builder->lakeRule($name, $expression);
     }
 
     /**
@@ -80,7 +136,7 @@ class PegGrammarParser
     private function parseSequence(): ExpressionInterface
     {
         $items = [];
-        while (!$this->check('SLASH') && !$this->check('RPAREN') && !$this->check('EOF') && !$this->isRuleStart()) {
+        while (!$this->check('SLASH') && !$this->check('RPAREN') && !$this->check('EOF') && !$this->check('AT') && !$this->isRuleStart()) {
             $items[] = $this->parsePrefix();
         }
 
@@ -194,6 +250,17 @@ class PegGrammarParser
     }
 
     /**
+     * Detects whether the current token starts a lake profile declaration.
+     */
+    private function isLakeDeclarationStart(): bool
+    {
+        return $this->check('LT')
+            && $this->peekAt(1)->type === 'IDENT'
+            && $this->peekAt(2)->type === 'GT'
+            && $this->peekAt(3)->type === 'ARROW';
+    }
+
+    /**
      * Matches the provided token type at the current cursor.
      */
     private function match(string $type): bool
@@ -241,6 +308,14 @@ class PegGrammarParser
     private function peekNext(): PegToken
     {
         return $this->tokens[$this->index + 1] ?? end($this->tokens);
+    }
+
+    /**
+     * Returns the token at the provided lookahead distance.
+     */
+    private function peekAt(int $distance): PegToken
+    {
+        return $this->tokens[$this->index + $distance] ?? end($this->tokens);
     }
 
     /**

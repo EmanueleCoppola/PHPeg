@@ -54,14 +54,15 @@ php bin/phpeg benchmark --json
 
 ## Benchmark Cases
 
-The suite currently includes six benchmark cases:
+The suite currently includes seven benchmark cases:
 
 - `Large arithmetic expression`: long precedence-sensitive expressions with nested parentheses, integers, and decimals.
 - `Deep nested recursion`: repeated `f(f(...value...))` style nesting to stress recursive descent depth and stack behavior.
 - `Large JSON-like document`: realistic nested objects and arrays with strings, numbers, booleans, and null values.
 - `Backtracking-heavy grammar`: many long alternatives sharing the same prefix to stress ordered-choice backtracking.
-- `Island parsing with lakes`: a recursive island grammar that uses native lake nodes for water capture.
-- `Island parsing with manual water`: the same island grammar shape implemented with an explicit manual water rule for comparison.
+- `Island parsing with lakes`: a recursive island grammar over a mixed config-like document, using native lake nodes for water capture.
+- `Island parsing with manual water`: the same mixed document shape implemented with an explicit manual water rule for comparison.
+- `Island parsing with annotated water`: the same mixed document shape with `@water` marking reusable water rules.
 
 Each benchmark defines its own grammar, generates input at runtime, and validates that parsing actually succeeds on the generated input.
 

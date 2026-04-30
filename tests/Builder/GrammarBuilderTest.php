@@ -58,6 +58,24 @@ class GrammarBuilderTest extends TestCase
     }
 
     /**
+     * Verifies named lake profiles can be declared without affecting the start rule.
+     */
+    public function testCreatesNamedLakeProfiles(): void
+    {
+        $builder = GrammarBuilder::create();
+        $grammar = $builder
+            ->lakeRule('BodyWater', $builder->regex('[^{}]+'))
+            ->grammar('Program')
+            ->rule('Program', $builder->seq($builder->literal('{'), $builder->lake('BodyWater'), $builder->literal('}')))
+            ->build();
+
+        self::assertSame('Program', $grammar->startRule());
+        self::assertInstanceOf(RegexExpression::class, $grammar->lakeProfile('BodyWater'));
+        self::assertNull($grammar->rule('BodyWater'));
+        self::assertTrue($grammar->parse('{abc}')->isSuccess());
+    }
+
+    /**
      * Rejects building without a start rule.
      */
     public function testRejectsMissingStartRule(): void

@@ -207,6 +207,19 @@ class ParseContext
     }
 
     /**
+     * Matches a named rule without recording failures.
+     */
+    public function matchRuleSilently(string $ruleName, int $offset): ?MatchResult
+    {
+        $this->failureSuppressionDepth++;
+        try {
+            return $this->matchRule($ruleName, $offset);
+        } finally {
+            $this->failureSuppressionDepth--;
+        }
+    }
+
+    /**
      * Records an expected token description at a failing offset.
      */
     public function recordFailure(int $offset, string $expected): void

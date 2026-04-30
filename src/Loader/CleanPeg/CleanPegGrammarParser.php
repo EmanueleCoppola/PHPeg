@@ -52,11 +52,25 @@ class CleanPegGrammarParser
                 break;
             }
 
+            if ($this->isLakeDeclarationStart()) {
+                $this->parseLakeDeclaration();
+                if (!$this->check('EOF')) {
+                    $this->consume('NEWLINE', 'expected end of lake declaration');
+                }
+                continue;
+            }
+
+            $annotations = $this->parseAnnotations();
+            $this->consumeNewlines();
             $name = $this->consume('IDENT', 'expected rule name')->lexeme;
             $this->consume('EQUAL', 'expected "=" after rule name');
             $expression = $this->parseExpression();
-            $this->builder->rule($name, $expression);
-            $firstRule ??= $name;
+            if ($annotations['lake']) {
+                $this->builder->lakeRule($name, $expression);
+            } else {
+                $this->builder->rule($name, $expression, $annotations['water']);
+                $firstRule ??= $name;
+            }
 
             if (!$this->check('EOF')) {
                 $this->consume('NEWLINE', 'expected end of rule');
@@ -70,6 +84,58 @@ class CleanPegGrammarParser
         $this->builder->grammar($this->startRule ?? $firstRule);
 
         return $this->builder->build();
+    }
+
+    /**
+     * Parses optional `@water` annotations before a rule definition.
+     *
+     * @return array{water: bool, lake: bool}
+     */
+    private function parseAnnotations(): array
+    {
+        $isWater = false;
+        $isLake = false;
+
+        while ($this->match('AT')) {
+            $annotation = $this->consume('IDENT', 'expected annotation name after "@"')->lexeme;
+            if ($annotation === 'water') {
+                $isWater = true;
+                while ($this->match('NEWLINE')) {
+                }
+                continue;
+            }
+
+            if ($annotation === 'lake') {
+                $isLake = true;
+                while ($this->match('NEWLINE')) {
+                }
+                continue;
+            }
+
+            $token = $this->peek();
+            throw new GrammarSyntaxError('CleanPeg', $token->line, $token->column, sprintf('unsupported annotation "@%s"', $annotation));
+        }
+
+        if ($isWater && $isLake) {
+            $token = $this->peek();
+            throw new GrammarSyntaxError('CleanPeg', $token->line, $token->column, 'annotations "@water" and "@lake" cannot be combined on the same rule');
+        }
+
+        return ['water' => $isWater, 'lake' => $isLake];
+    }
+
+    /**
+     * Parses a named lake profile declaration in the form `<Name> = expression`.
+     */
+    private function parseLakeDeclaration(): void
+    {
+        $this->consume('LT', 'expected "<" at the beginning of a lake declaration');
+        $name = $this->consume('IDENT', 'expected lake name after "<"')->lexeme;
+        $this->consume('GT', 'expected ">" after lake name');
+        $this->consume('EQUAL', 'expected "=" after lake name');
+        $expression = $this->parseExpression();
+
+        $this->builder->lakeRule($name, $expression);
     }
 
     /**
@@ -207,6 +273,17 @@ class CleanPegGrammarParser
     }
 
     /**
+     * Detects whether the current token starts a lake profile declaration.
+     */
+    private function isLakeDeclarationStart(): bool
+    {
+        return $this->check('LT')
+            && $this->peekAt(1)->type === 'IDENT'
+            && $this->peekAt(2)->type === 'GT'
+            && $this->peekAt(3)->type === 'EQUAL';
+    }
+
+    /**
      * Parses a lake expression in `~`, `<Name>`, or `<>` form.
      */
     private function parseLakeExpression(): ExpressionInterface
@@ -285,5 +362,13 @@ class CleanPegGrammarParser
     private function previous(): CleanPegToken
     {
         return $this->tokens[$this->index - 1];
+    }
+
+    /**
+     * Returns the token at the provided lookahead distance.
+     */
+    private function peekAt(int $distance): CleanPegToken
+    {
+        return $this->tokens[$this->index + $distance] ?? end($this->tokens);
     }
 }

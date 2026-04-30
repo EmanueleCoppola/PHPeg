@@ -20,10 +20,12 @@ class Grammar
 {
     /**
      * @param array<string, Rule> $rules
+     * @param array<string, ExpressionInterface> $lakeProfiles
      */
     public function __construct(
         private readonly array $rules,
         private readonly string $startRule,
+        private readonly array $lakeProfiles = [],
     ) {
     }
 
@@ -49,6 +51,37 @@ class Grammar
     public function rules(): array
     {
         return $this->rules;
+    }
+
+    /**
+     * Returns the rules annotated as water, preserving grammar order.
+     *
+     * @return list<Rule>
+     */
+    public function waterRules(): array
+    {
+        return array_values(array_filter(
+            $this->rules,
+            static fn (Rule $rule): bool => $rule->isWater(),
+        ));
+    }
+
+    /**
+     * Returns the lake profile expression for the provided lake name, or null when missing.
+     */
+    public function lakeProfile(string $name): ?ExpressionInterface
+    {
+        return $this->lakeProfiles[$name] ?? null;
+    }
+
+    /**
+     * Returns all named lake profiles.
+     *
+     * @return array<string, ExpressionInterface>
+     */
+    public function lakeProfiles(): array
+    {
+        return $this->lakeProfiles;
     }
 
     /**

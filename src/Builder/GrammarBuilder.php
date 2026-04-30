@@ -33,6 +33,11 @@ class GrammarBuilder
      */
     private array $rules = [];
 
+    /**
+     * @var array<string, ExpressionInterface>
+     */
+    private array $lakeProfiles = [];
+
     private ?string $startRule = null;
 
     /**
@@ -55,14 +60,26 @@ class GrammarBuilder
 
     /**
      * Adds or replaces a rule definition.
+     *
+     * @param bool $isWater Marks the rule as water so lake matching can consume it as background text.
      */
-    public function rule(string $name, ExpressionInterface $expression): self
+    public function rule(string $name, ExpressionInterface $expression, bool $isWater = false): self
     {
         if ($this->startRule === null) {
             $this->startRule = $name;
         }
 
-        $this->rules[$name] = new Rule($name, $expression);
+        $this->rules[$name] = new Rule($name, $expression, $isWater);
+
+        return $this;
+    }
+
+    /**
+     * Adds or replaces a named lake profile used by lake expressions with the same name.
+     */
+    public function lakeRule(string $name, ExpressionInterface $expression): self
+    {
+        $this->lakeProfiles[$name] = $expression;
 
         return $this;
     }
@@ -76,7 +93,7 @@ class GrammarBuilder
             throw new InvalidArgumentException('Cannot build a grammar without a start rule.');
         }
 
-        return new Grammar($this->rules, $this->startRule);
+        return new Grammar($this->rules, $this->startRule, $this->lakeProfiles);
     }
 
     /**

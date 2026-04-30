@@ -21,4 +21,48 @@ class PegGrammarParserTest extends TestCase
         self::assertTrue($grammar->parse('{abc}')->isSuccess());
         self::assertInstanceOf(LakeExpression::class, $grammar->rule('Start')?->expression()->expressions()[1] ?? null);
     }
+
+    /**
+     * Verifies PEG water annotations are parsed and used during lake matching.
+     */
+    public function testParsesPegWaterAnnotation(): void
+    {
+        $grammar = PegGrammarParser::parse(<<<'PEG'
+Start <- "{" <Body> "}"
+@water
+Quoted <- '"' [^"]* '"'
+PEG);
+
+        $document = $grammar->parseDocument('{foo "bar" baz}');
+        $body = $document->query('Body[kind="lake"]:first')->first();
+        $quoted = $body?->childrenByName('Quoted')[0] ?? null;
+
+        self::assertNotNull($body);
+        self::assertSame('Body', $body?->name());
+        self::assertCount(1, $body?->childrenByName('Quoted') ?? []);
+        self::assertSame('water', $quoted?->attribute('kind'));
+        self::assertSame('"bar"', $quoted?->text());
+    }
+
+    /**
+     * Verifies PEG lake declarations can use a local water profile.
+     */
+    public function testParsesPegLakeProfileAnnotation(): void
+    {
+        $grammar = PegGrammarParser::parse(<<<'PEG'
+<BodyWater> <- [^{}]+
+Program <- "{" <BodyWater> "}"
+@water
+Whitespace <- [ \t\r\n]+
+PEG);
+
+        $document = $grammar->parseDocument('{foo bar}');
+        $lake = $document->query('BodyWater[kind="lake"]:first')->first();
+        $water = $document->query('BodyWater[kind="water"]:first')->first();
+
+        self::assertNotNull($lake);
+        self::assertNotNull($water);
+        self::assertSame('foo bar', $lake?->text());
+        self::assertSame('foo bar', $water?->text());
+    }
 }

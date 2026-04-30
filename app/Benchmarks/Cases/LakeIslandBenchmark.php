@@ -31,10 +31,10 @@ class LakeIslandBenchmark extends AbstractIslandBenchmark
     public function input(string $scale): string
     {
         return match ($scale) {
-            'small' => $this->sparseInput(12),
-            'medium' => $this->denseInput(72),
-            'large' => $this->nestedWorstCaseInput(48, 8),
-            default => $this->sparseInput(12),
+            'small' => $this->realisticMixedInput(2, 1),
+            'medium' => $this->realisticMixedInput(4, 1),
+            'large' => $this->realisticMixedInput(6, 1),
+            default => $this->realisticMixedInput(2, 1),
         };
     }
 
