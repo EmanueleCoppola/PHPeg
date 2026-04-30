@@ -156,7 +156,30 @@ In that grammar, the top-level lake stops before `function` or EOF, the paramete
 
 Lake nodes are especially useful for island parsing, partial grammars, and source-preserving editing of documents that contain a lot of irrelevant text.
 
-If you want to read more about the idea behind lake nodes, see [docs/lake-symbols.md](../lake-symbols.md).
+### Water Symbols
+
+Use `@water` before a rule to mark it as reusable background content for lake parsing.
+Use `<Name> = ...` to declare a named lake profile that applies only to `<Name>` with the same name.
+
+```cleanpeg
+@water
+Whitespace = r'[ \t\r\n]+'
+```
+
+Water rules let you name common fragments like whitespace, comments, or strings once and reuse them as lake-friendly background content.
+
+Named lake profiles let you keep that reusable background local to a specific lake:
+
+```cleanpeg
+<BodyWater> = r'[^{}]+'
+Program = "{" <BodyWater> "}"
+@water
+Whitespace = r'[ \t\r\n]+'
+```
+
+In that example, `<BodyWater>` prefers the local `BodyWater` profile, while other lakes still fall back to the grammar-wide `@water` rules.
+
+If you want to read more about lake and water symbols, see [docs/lake-symbols.md](../lake-symbols.md).
 
 ### Comments
 

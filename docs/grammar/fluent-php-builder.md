@@ -28,8 +28,9 @@ The builder has four steps:
 
 1. `GrammarBuilder::create()` creates a new builder instance.
 2. `grammar($startRule)` optionally declares the start rule name.
-3. `rule($name, $expression)` adds or replaces a rule.
-4. `build()` returns the immutable `Grammar`.
+3. `rule($name, $expression, ?bool $isWater = false)` adds or replaces a rule.
+4. `lakeRule($name, $expression)` adds or replaces a named lake profile.
+5. `build()` returns the immutable `Grammar`.
 
 If you do not call `grammar()`, the first rule you add becomes the start rule.
 
@@ -38,7 +39,8 @@ If you do not call `grammar()`, the first rule you add becomes the start rule.
 ### Grammar Definition
 
 - `grammar(string $startRule): self`
-- `rule(string $name, ExpressionInterface $expression): self`
+- `rule(string $name, ExpressionInterface $expression, bool $isWater = false): self`
+- `lakeRule(string $name, ExpressionInterface $expression): self`
 - `build(): Grammar`
 
 ### Expression Constructors
@@ -198,14 +200,26 @@ Lake nodes are the island-parsing primitive in PHPeg.
 `lake()` creates an unnamed lake node by default, which is named `Lake` in the AST.
 Passing a string name creates a named lake node, such as `BodyWater`.
 
-When you write the same idea in a loader grammar, use `~` or `<>` for an unnamed lake and `<Name>` for a named lake.
+When you write the same idea in a loader grammar, use `~` or `<>` for an unnamed lake, `<Name>` for a named lake, and `<Name> <- ...` or `<Name> = ...` for a named lake profile.
 
 Lake nodes consume water until the compiled stop set is reached. That makes them useful when you want to describe only the interesting islands in a larger document and leave the surrounding text untouched.
+
+Water rules are the expressions the lake can reuse as background content. In the builder, mark a rule as water by passing `true` as the third argument to `rule()`.
+
+If you want a lake with its own local water profile, declare it with `lakeRule()` and reuse the same name in `lake()`:
+
+```php
+$grammar = $g->grammar('Program')
+    ->lakeRule('BodyWater', $g->regex('[^{}]+'))
+    ->rule('Program', $g->seq($g->literal('{'), $g->lake('BodyWater'), $g->literal('}')))
+    ->build();
+```
 
 Practical effects:
 
 - the unnamed lake node is named `Lake`
 - a named lake node uses the provided name
+- a named lake can use a local lake profile when one is declared
 - unchanged documents still print back byte-for-byte identical
 - lake nodes can be queried like regular AST nodes
 
@@ -231,7 +245,7 @@ $grammar = $g->grammar('Program')
 
 In that grammar, the top-level lake stops before `function` or EOF, the parameter lake stops before `)`, and the block lake stops before `}`.
 
-If you want to read more about the idea behind lake nodes, see [docs/lake-symbols.md](../lake-symbols.md).
+If you want to read more about lake and water symbols, see [docs/lake-symbols.md](../lake-symbols.md).
 
 ## Example Grammar
 

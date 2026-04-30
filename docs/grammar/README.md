@@ -33,9 +33,12 @@ Practical differences:
 
 All three styles compile to the same runtime model:
 
-- `Grammar` stores named `Rule` objects plus a start rule.
+- `Grammar` stores named `Rule` objects plus a start rule and optional named lake profiles.
 - `Grammar::parse()` returns a `ParseResult`.
 - `Grammar::parseDocument()` returns a `ParsedDocument` for source-preserving editing.
 - Parsed rules produce `AstNode` trees with rule names, offsets, text, children, attributes, and mutation support.
 
 The style-specific pages below focus on syntax. For AST querying and mutation, see the shared model sections inside each page and the existing AST docs.
+
+Lake symbols let a grammar describe the interesting islands inside a larger document, while water symbols mark reusable background rules such as whitespace, comments, or strings.
+If you want to read more about lake and water symbols, see [docs/lake-symbols.md](../lake-symbols.md).
