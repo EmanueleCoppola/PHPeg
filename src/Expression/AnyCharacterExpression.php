@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class AnyCharacterExpression extends AbstractExpression
 {
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         $char = $context->input()->charAt($offset);
@@ -24,6 +27,9 @@ class AnyCharacterExpression extends AbstractExpression
         return new MatchResult($offset, $offset + 1);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return '.';

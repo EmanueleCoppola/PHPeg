@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Grammar\Grammar;
  */
 class CleanPegGrammarLoader
 {
+    /**
+     * Initializes a new CleanPegGrammarLoader instance.
+     */
     public function __construct(
         private readonly ?string $skipPattern = '[ \t\r\n]*',
     ) {

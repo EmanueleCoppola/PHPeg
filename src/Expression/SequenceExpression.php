@@ -28,6 +28,9 @@ class SequenceExpression extends AbstractExpression
         return $this->expressions;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         $nodes = [];
@@ -48,6 +51,9 @@ class SequenceExpression extends AbstractExpression
         return new MatchResult($offset, $cursor, $nodes);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return 'sequence';

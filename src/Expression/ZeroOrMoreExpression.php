@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class ZeroOrMoreExpression extends AbstractExpression
 {
+    /**
+     * Initializes a new ZeroOrMoreExpression instance.
+     */
     public function __construct(
         private readonly ExpressionInterface $expression,
     ) {
@@ -25,6 +28,9 @@ class ZeroOrMoreExpression extends AbstractExpression
         return $this->expression;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         $nodes = [];
@@ -45,6 +51,9 @@ class ZeroOrMoreExpression extends AbstractExpression
         return new MatchResult($offset, $cursor, $nodes);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return $this->expression->describe() . '*';

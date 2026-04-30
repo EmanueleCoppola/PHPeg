@@ -20,21 +20,33 @@ class AstNodeCollection
     ) {
     }
 
+    /**
+     * Returns the number of items in the collection.
+     */
     public function count(): int
     {
         return count($this->nodes);
     }
 
+    /**
+     * Returns whether the collection is empty.
+     */
     public function isEmpty(): bool
     {
         return $this->nodes === [];
     }
 
+    /**
+     * Returns the first item, or null when the collection is empty.
+     */
     public function first(): ?AstNode
     {
         return $this->nodes[0] ?? null;
     }
 
+    /**
+     * Returns the last item, or null when the collection is empty.
+     */
     public function last(): ?AstNode
     {
         return $this->nodes === [] ? null : $this->nodes[array_key_last($this->nodes)];
@@ -60,6 +72,9 @@ class AstNodeCollection
         return $this;
     }
 
+    /**
+     * Appends a cloned node to each selected node.
+     */
     public function appendNode(AstNode $node): self
     {
         foreach ($this->nodes as $target) {
@@ -69,6 +84,9 @@ class AstNodeCollection
         return $this;
     }
 
+    /**
+     * Prepends a cloned node to each selected node.
+     */
     public function prependNode(AstNode $node): self
     {
         foreach ($this->nodes as $target) {

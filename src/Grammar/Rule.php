@@ -14,6 +14,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class Rule
 {
+    /**
+     * Initializes a new Rule instance.
+     */
     public function __construct(
         private readonly string $name,
         private readonly ExpressionInterface $expression,

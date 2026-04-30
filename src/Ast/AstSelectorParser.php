@@ -11,6 +11,9 @@ use EmanueleCoppola\PHPeg\Error\AstQueryError;
  */
 class AstSelectorParser
 {
+    /**
+     * Parses the provided source text.
+     */
     public static function parse(string $selector): AstSelector
     {
         $selector = trim($selector);

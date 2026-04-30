@@ -62,6 +62,9 @@ class AstNode
      */
     private array $insertAfter = [];
 
+    /**
+     * Creates a detached clone for source-preserving mutations.
+     */
     public function __clone()
     {
         $this->parent = null;
@@ -433,6 +436,9 @@ class AstNode
         return $this->children();
     }
 
+    /**
+     * Inserts a child node relative to the current node ordering.
+     */
     private function insertChild(AstNode $node, InsertPosition $position): self
     {
         if (!$this->canContainChildren()) {
@@ -471,6 +477,9 @@ class AstNode
         return $this;
     }
 
+    /**
+     * Inserts a child before or after another child node.
+     */
     private function insertRelativeToChild(AstNode $target, AstNode $node, InsertPosition $position): void
     {
         $this->ensureOriginalStructureTracking();
@@ -500,6 +509,9 @@ class AstNode
         $this->markModified();
     }
 
+    /**
+     * Replaces an existing child with a new node.
+     */
     private function replaceChild(AstNode $target, AstNode $replacement): void
     {
         $this->ensureOriginalStructureTracking();
@@ -523,6 +535,9 @@ class AstNode
         $this->markModified();
     }
 
+    /**
+     * Removes a child node from the current node.
+     */
     private function removeChild(AstNode $target): void
     {
         $this->ensureOriginalStructureTracking();
@@ -536,6 +551,9 @@ class AstNode
         $this->markModified();
     }
 
+    /**
+     * Finds the index of a child node in the current children list.
+     */
     private function findChildIndex(AstNode $target): int
     {
         foreach ($this->children as $index => $child) {
@@ -547,6 +565,9 @@ class AstNode
         throw new AstMutationError('Target node is not a child of the expected parent.');
     }
 
+    /**
+     * Finds the index of a child in the original child snapshot.
+     */
     private function findOriginalChildIndex(AstNode $target): ?int
     {
         foreach ($this->currentOriginalChildren() as $index => $child) {
@@ -558,6 +579,9 @@ class AstNode
         return null;
     }
 
+    /**
+     * Marks the document as modified.
+     */
     private function markModified(): void
     {
         $this->modified = true;
@@ -569,6 +593,9 @@ class AstNode
         }
     }
 
+    /**
+     * Derives a semantic name from common child node patterns.
+     */
     private function derivedNameAttribute(): ?string
     {
         foreach (['Identifier', 'Name', 'Key'] as $childName) {
@@ -581,6 +608,9 @@ class AstNode
         return null;
     }
 
+    /**
+     * Derives a semantic value from common child node patterns.
+     */
     private function derivedValueAttribute(): ?string
     {
         foreach (['Value', 'String', 'Number', 'Literal', 'Path', 'Url', 'ValueList'] as $childName) {

@@ -15,6 +15,9 @@ class CharClassExpression extends AbstractExpression
 {
     private readonly string $regex;
 
+    /**
+     * Initializes a new CharClassExpression instance.
+     */
     public function __construct(
         private readonly string $pattern,
     ) {
@@ -33,6 +36,9 @@ class CharClassExpression extends AbstractExpression
         return $this->pattern;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         if (preg_match($this->regex, $context->input()->text(), $matches, 0, $offset) !== 1) {
@@ -44,6 +50,9 @@ class CharClassExpression extends AbstractExpression
         return new MatchResult($offset, $offset + strlen($matches[0]));
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return $this->pattern;

@@ -17,6 +17,9 @@ class RegexExpression extends AbstractExpression
 
     private readonly string $description;
 
+    /**
+     * Initializes a new RegexExpression instance.
+     */
     public function __construct(
         private readonly string $pattern,
     ) {
@@ -41,6 +44,9 @@ class RegexExpression extends AbstractExpression
         return $this->pattern;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         if (preg_match($this->regex, $context->input()->text(), $matches, 0, $offset) !== 1) {
@@ -52,6 +58,9 @@ class RegexExpression extends AbstractExpression
         return new MatchResult($offset, $offset + strlen($matches[0]));
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return $this->description;

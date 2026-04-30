@@ -21,11 +21,17 @@ class AstSelectorStep
     ) {
     }
 
+    /**
+     * Returns the stored name.
+     */
     public function name(): string
     {
         return $this->name;
     }
 
+    /**
+     * Returns the selector combinator.
+     */
     public function combinator(): string
     {
         return $this->combinator;
@@ -39,11 +45,17 @@ class AstSelectorStep
         return $this->attributes;
     }
 
+    /**
+     * Returns the pseudo-selector, if any.
+     */
     public function pseudo(): ?string
     {
         return $this->pseudo;
     }
 
+    /**
+     * Returns the pseudo-selector argument, if any.
+     */
     public function pseudoArgument(): ?int
     {
         return $this->pseudoArgument;

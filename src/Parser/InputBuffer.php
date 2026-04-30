@@ -16,6 +16,9 @@ class InputBuffer
      */
     private ?array $lineBreakOffsets = null;
 
+    /**
+     * Initializes a new InputBuffer instance.
+     */
     public function __construct(
         private readonly string $input,
     ) {

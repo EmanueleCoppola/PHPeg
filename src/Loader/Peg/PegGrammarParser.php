@@ -36,6 +36,9 @@ class PegGrammarParser
         return $parser->parseGrammar();
     }
 
+    /**
+     * Reads the full rule list and builds the grammar.
+     */
     private function parseGrammar(): Grammar
     {
         $firstRule = null;
@@ -56,6 +59,9 @@ class PegGrammarParser
         return $this->builder->build();
     }
 
+    /**
+     * Parses a choice expression separated by `/`.
+     */
     private function parseExpression(): ExpressionInterface
     {
         $sequence = $this->parseSequence();
@@ -68,6 +74,9 @@ class PegGrammarParser
         return count($alternatives) === 1 ? $sequence : $this->builder->choice(...$alternatives);
     }
 
+    /**
+     * Parses a PEG sequence until the current branch ends.
+     */
     private function parseSequence(): ExpressionInterface
     {
         $items = [];
@@ -78,6 +87,9 @@ class PegGrammarParser
         return count($items) === 1 ? $items[0] : $this->builder->seq(...$items);
     }
 
+    /**
+     * Parses unary lookahead prefixes.
+     */
     private function parsePrefix(): ExpressionInterface
     {
         if ($this->match('AND')) {
@@ -91,6 +103,9 @@ class PegGrammarParser
         return $this->parseSuffix();
     }
 
+    /**
+     * Parses repetition postfixes applied to the current term.
+     */
     private function parseSuffix(): ExpressionInterface
     {
         $expression = $this->parsePrimary();
@@ -110,6 +125,9 @@ class PegGrammarParser
         return $expression;
     }
 
+    /**
+     * Parses the next atomic expression or grouping.
+     */
     private function parsePrimary(): ExpressionInterface
     {
         if ($this->match('LITERAL')) {
@@ -167,11 +185,17 @@ class PegGrammarParser
         return $this->builder->lake($name);
     }
 
+    /**
+     * Detects whether the current token starts a new rule declaration.
+     */
     private function isRuleStart(): bool
     {
         return $this->check('IDENT') && $this->peekNext()->type === 'ARROW';
     }
 
+    /**
+     * Matches the provided token type at the current cursor.
+     */
     private function match(string $type): bool
     {
         if (!$this->check($type)) {
@@ -183,6 +207,9 @@ class PegGrammarParser
         return true;
     }
 
+    /**
+     * Advances only when the current token matches the expected type.
+     */
     private function consume(string $type, string $message): PegToken
     {
         if ($this->check($type)) {
@@ -192,21 +219,33 @@ class PegGrammarParser
         throw new InvalidArgumentException($message);
     }
 
+    /**
+     * Checks whether the current token type matches.
+     */
     private function check(string $type): bool
     {
         return $this->peek()->type === $type;
     }
 
+    /**
+     * Returns the current token.
+     */
     private function peek(): PegToken
     {
         return $this->tokens[$this->index];
     }
 
+    /**
+     * Returns the next token when available.
+     */
     private function peekNext(): PegToken
     {
         return $this->tokens[$this->index + 1] ?? end($this->tokens);
     }
 
+    /**
+     * Returns the token immediately before the current cursor.
+     */
     private function previous(): PegToken
     {
         return $this->tokens[$this->index - 1];

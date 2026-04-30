@@ -28,6 +28,9 @@ class ChoiceExpression extends AbstractExpression
         return $this->alternatives;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         foreach ($this->alternatives as $alternative) {
@@ -40,6 +43,9 @@ class ChoiceExpression extends AbstractExpression
         return null;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return 'choice';

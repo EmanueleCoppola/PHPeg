@@ -54,6 +54,9 @@ class AstPrinter
         );
     }
 
+    /**
+     * Formats a node label for the tree view.
+     */
     private static function label(AstNode $node): string
     {
         $name = $node->name();

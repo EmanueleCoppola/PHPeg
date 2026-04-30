@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class NotPredicateExpression extends AbstractExpression
 {
+    /**
+     * Initializes a new NotPredicateExpression instance.
+     */
     public function __construct(
         private readonly ExpressionInterface $expression,
     ) {
@@ -25,6 +28,9 @@ class NotPredicateExpression extends AbstractExpression
         return $this->expression;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         if ($context->matchExpressionSilently($this->expression, $offset) !== null) {
@@ -36,6 +42,9 @@ class NotPredicateExpression extends AbstractExpression
         return $context->emptyMatch($offset);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return '!' . $this->expression->describe();

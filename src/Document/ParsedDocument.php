@@ -20,6 +20,9 @@ class ParsedDocument
 {
     private bool $modified = false;
 
+    /**
+     * Initializes a new ParsedDocument instance.
+     */
     public function __construct(
         private readonly Grammar $grammar,
         private readonly string $source,
@@ -28,26 +31,41 @@ class ParsedDocument
         $this->root->attachDocument($this);
     }
 
+    /**
+     * Returns the parsed root node.
+     */
     public function root(): AstNode
     {
         return $this->root;
     }
 
+    /**
+     * Returns the original source text.
+     */
     public function source(): string
     {
         return $this->source;
     }
 
+    /**
+     * Returns whether the document has been modified.
+     */
     public function isModified(): bool
     {
         return $this->modified;
     }
 
+    /**
+     * Marks the document as modified.
+     */
     public function markModified(): void
     {
         $this->modified = true;
     }
 
+    /**
+     * Returns the AST nodes matching the selector.
+     */
     public function query(string $selector, ?AstNode $scope = null): AstNodeCollection
     {
         $selectorAst = AstSelectorParser::parse($selector);
@@ -74,21 +92,33 @@ class ParsedDocument
         return new AstNodeCollection($current, $this);
     }
 
+    /**
+     * Renders the document with source preservation.
+     */
     public function print(?PrintPolicy $policy = null): string
     {
         return (new SourcePreservingPrinter($policy ?? new PrintPolicy()))->print($this->root);
     }
 
+    /**
+     * Re-parses the rendered source to validate the current tree.
+     */
     public function validatePrintedSource(): ParseResult
     {
         return $this->grammar->parse($this->print(), $this->root->name());
     }
 
+    /**
+     * Validates the document by re-parsing the rendered source.
+     */
     public function validate(): ParseResult
     {
         return $this->validatePrintedSource();
     }
 
+    /**
+     * Returns whether the node matches the current selector step.
+     */
     private function matchesStep(AstNode $node, AstSelectorStep $step): bool
     {
         if ($node->name() !== $step->name()) {

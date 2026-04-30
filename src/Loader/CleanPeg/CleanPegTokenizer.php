@@ -19,6 +19,9 @@ class CleanPegTokenizer
 
     private int $length;
 
+    /**
+     * Initializes a new CleanPegTokenizer instance.
+     */
     public function __construct(
         private readonly string $source,
     ) {
@@ -96,6 +99,9 @@ class CleanPegTokenizer
         return $tokens;
     }
 
+    /**
+     * Reads an identifier from the current cursor.
+     */
     private function readIdentifier(): string
     {
         $start = $this->offset;
@@ -108,6 +114,9 @@ class CleanPegTokenizer
         return substr($this->source, $start, $this->offset - $start);
     }
 
+    /**
+     * Reads a quoted string literal from the current cursor.
+     */
     private function readString(): string
     {
         $this->advance();
@@ -144,6 +153,9 @@ class CleanPegTokenizer
         throw new GrammarSyntaxError('CleanPeg', $this->line, $this->column, 'unclosed string literal');
     }
 
+    /**
+     * Reads a regex literal from the current cursor.
+     */
     private function readRegex(): string
     {
         $this->advance();
@@ -182,12 +194,18 @@ class CleanPegTokenizer
         throw new GrammarSyntaxError('CleanPeg', $this->line, $this->column, 'unclosed regex literal');
     }
 
+    /**
+     * Advances the cursor by one character.
+     */
     private function advance(): void
     {
         $this->offset++;
         $this->column++;
     }
 
+    /**
+     * Advances the cursor to the next line.
+     */
     private function advanceLine(): void
     {
         $this->offset++;

@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Error\ParseError;
  */
 class ParseResult
 {
+    /**
+     * Initializes a new ParseResult instance.
+     */
     private function __construct(
         private readonly bool $success,
         private readonly int $finalOffset,

@@ -39,6 +39,9 @@ class CleanPegGrammarParser
         return $parser->parseGrammar();
     }
 
+    /**
+     * Reads the full CleanPeg rule list and builds the grammar.
+     */
     private function parseGrammar(): Grammar
     {
         $firstRule = null;
@@ -69,11 +72,17 @@ class CleanPegGrammarParser
         return $this->builder->build();
     }
 
+    /**
+     * Parses the top-level expression entry point.
+     */
     private function parseExpression(): ExpressionInterface
     {
         return $this->parseChoice();
     }
 
+    /**
+     * Parses a choice expression separated by `/`.
+     */
     private function parseChoice(): ExpressionInterface
     {
         $sequence = $this->parseSequence();
@@ -86,6 +95,9 @@ class CleanPegGrammarParser
         return count($alternatives) === 1 ? $sequence : $this->builder->choice(...$alternatives);
     }
 
+    /**
+     * Parses a sequence until the current expression ends.
+     */
     private function parseSequence(): ExpressionInterface
     {
         $items = [];
@@ -102,6 +114,9 @@ class CleanPegGrammarParser
         return count($items) === 1 ? $items[0] : $this->builder->seq(...$items);
     }
 
+    /**
+     * Parses repetition postfixes applied to the current term.
+     */
     private function parsePostfix(): ExpressionInterface
     {
         $expression = $this->parsePrimary();
@@ -121,6 +136,9 @@ class CleanPegGrammarParser
         return $expression;
     }
 
+    /**
+     * Parses an atomic CleanPeg expression.
+     */
     private function parsePrimary(): ExpressionInterface
     {
         if ($this->match('STRING')) {
@@ -160,6 +178,9 @@ class CleanPegGrammarParser
         throw new GrammarSyntaxError('CleanPeg', $token->line, $token->column, 'expected expression');
     }
 
+    /**
+     * Wraps an expression with the configured skip prefix when needed.
+     */
     private function wrapSkippable(ExpressionInterface $expression): ExpressionInterface
     {
         if ($this->skipExpression === null) {
@@ -169,6 +190,9 @@ class CleanPegGrammarParser
         return $this->builder->seq($this->skipExpression, $expression);
     }
 
+    /**
+     * Detects whether the current token can start a primary expression.
+     */
     private function isPrimaryStart(): bool
     {
         if ($this->check('STRING') || $this->check('REGEX') || $this->check('LPAREN')) {
@@ -203,12 +227,18 @@ class CleanPegGrammarParser
         return $this->builder->lake($name);
     }
 
+    /**
+     * Consumes consecutive newline tokens between rules.
+     */
     private function consumeNewlines(): void
     {
         while ($this->match('NEWLINE')) {
         }
     }
 
+    /**
+     * Matches the provided token type at the current cursor.
+     */
     private function match(string $type): bool
     {
         if (!$this->check($type)) {
@@ -220,6 +250,9 @@ class CleanPegGrammarParser
         return true;
     }
 
+    /**
+     * Advances only when the current token matches the expected type.
+     */
     private function consume(string $type, string $message): CleanPegToken
     {
         if ($this->check($type)) {
@@ -230,16 +263,25 @@ class CleanPegGrammarParser
         throw new GrammarSyntaxError('CleanPeg', $token->line, $token->column, $message);
     }
 
+    /**
+     * Checks whether the current token type matches.
+     */
     private function check(string $type): bool
     {
         return $this->peek()->type === $type;
     }
 
+    /**
+     * Returns the current token.
+     */
     private function peek(): CleanPegToken
     {
         return $this->tokens[$this->index];
     }
 
+    /**
+     * Returns the token immediately before the current cursor.
+     */
     private function previous(): CleanPegToken
     {
         return $this->tokens[$this->index - 1];

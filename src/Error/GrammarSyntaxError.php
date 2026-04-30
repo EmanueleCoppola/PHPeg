@@ -11,6 +11,9 @@ use InvalidArgumentException;
  */
 class GrammarSyntaxError extends InvalidArgumentException
 {
+    /**
+     * Initializes a new GrammarSyntaxError instance.
+     */
     public function __construct(
         private readonly string $grammarKind,
         private readonly int $syntaxLine,

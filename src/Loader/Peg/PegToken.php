@@ -9,6 +9,9 @@ namespace EmanueleCoppola\PHPeg\Loader\Peg;
  */
 class PegToken
 {
+    /**
+     * Initializes a new PegToken instance.
+     */
     public function __construct(
         public readonly string $type,
         public readonly string $lexeme,

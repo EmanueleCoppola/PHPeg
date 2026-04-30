@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class RuleReferenceExpression extends AbstractExpression
 {
+    /**
+     * Initializes a new RuleReferenceExpression instance.
+     */
     public function __construct(
         private readonly string $ruleName,
     ) {
@@ -25,11 +28,17 @@ class RuleReferenceExpression extends AbstractExpression
         return $this->ruleName;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         return $context->matchRule($this->ruleName, $offset);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return sprintf('<%s>', $this->ruleName);

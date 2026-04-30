@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class EndOfInputExpression extends AbstractExpression
 {
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         if ($offset !== $context->input()->length()) {
@@ -23,6 +26,9 @@ class EndOfInputExpression extends AbstractExpression
         return $context->emptyMatch($offset);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return 'EOF';

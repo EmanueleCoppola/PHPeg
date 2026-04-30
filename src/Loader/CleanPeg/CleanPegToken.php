@@ -9,6 +9,9 @@ namespace EmanueleCoppola\PHPeg\Loader\CleanPeg;
  */
 class CleanPegToken
 {
+    /**
+     * Initializes a new CleanPegToken instance.
+     */
     public function __construct(
         public readonly string $type,
         public readonly string $lexeme,

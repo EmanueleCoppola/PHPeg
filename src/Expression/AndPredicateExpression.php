@@ -12,6 +12,9 @@ use EmanueleCoppola\PHPeg\Result\MatchResult;
  */
 class AndPredicateExpression extends AbstractExpression
 {
+    /**
+     * Initializes a new AndPredicateExpression instance.
+     */
     public function __construct(
         private readonly ExpressionInterface $expression,
     ) {
@@ -25,11 +28,17 @@ class AndPredicateExpression extends AbstractExpression
         return $this->expression;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         return $context->matchExpressionSilently($this->expression, $offset) !== null ? $context->emptyMatch($offset) : null;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return '&' . $this->expression->describe();

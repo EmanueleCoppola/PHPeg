@@ -15,6 +15,9 @@ class PegTokenizer
 
     private int $length;
 
+    /**
+     * Initializes a new PegTokenizer instance.
+     */
     public function __construct(
         private readonly string $source,
     ) {
@@ -98,6 +101,9 @@ class PegTokenizer
         return $tokens;
     }
 
+    /**
+     * Skips whitespace and comments.
+     */
     private function skipIgnored(): void
     {
         while ($this->offset < $this->length) {
@@ -125,6 +131,9 @@ class PegTokenizer
         }
     }
 
+    /**
+     * Matches the provided token text at the current cursor.
+     */
     private function match(string $value): bool
     {
         if (substr_compare($this->source, $value, $this->offset, strlen($value)) !== 0) {
@@ -136,6 +145,9 @@ class PegTokenizer
         return true;
     }
 
+    /**
+     * Reads an identifier from the current cursor.
+     */
     private function readIdentifier(): string
     {
         $start = $this->offset;
@@ -148,6 +160,9 @@ class PegTokenizer
         return substr($this->source, $start, $this->offset - $start);
     }
 
+    /**
+     * Reads a quoted string literal from the current cursor.
+     */
     private function readString(string $quote): string
     {
         $this->offset++;
@@ -178,6 +193,9 @@ class PegTokenizer
         throw new InvalidArgumentException('Unterminated string literal in PEG grammar.');
     }
 
+    /**
+     * Reads a character class literal from the current cursor.
+     */
     private function readCharClass(): string
     {
         $start = $this->offset;

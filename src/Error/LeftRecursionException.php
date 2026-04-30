@@ -11,6 +11,9 @@ use RuntimeException;
  */
 class LeftRecursionException extends RuntimeException
 {
+    /**
+     * Initializes a new LeftRecursionException instance.
+     */
     public function __construct(
         private readonly string $ruleName,
         private readonly int $offset,

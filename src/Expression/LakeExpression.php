@@ -40,6 +40,9 @@ class LakeExpression extends AbstractExpression
     /**
      * Matches water up to the next valid stop point.
      */
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         return $context->matchLakeExpression($this, $offset);

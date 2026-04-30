@@ -12,11 +12,17 @@ use EmanueleCoppola\PHPeg\Error\PrintError;
  */
 class SourcePreservingPrinter
 {
+    /**
+     * Initializes a new SourcePreservingPrinter instance.
+     */
     public function __construct(
         private readonly PrintPolicy $policy = new PrintPolicy(),
     ) {
     }
 
+    /**
+     * Renders the node with source preservation.
+     */
     public function print(AstNode $node): string
     {
         if (!$node->isModified() && $node->isOriginal() && !$node->isRemoved()) {
@@ -43,6 +49,9 @@ class SourcePreservingPrinter
         return $this->renderOriginalNodeWithMutations($node);
     }
 
+    /**
+     * Renders a mutated leaf node.
+     */
     private function renderLeafMutation(AstNode $node): string
     {
         $text = $node->text();
@@ -53,6 +62,9 @@ class SourcePreservingPrinter
         return $node->originalText();
     }
 
+    /**
+     * Renders an original node after source-preserving mutations.
+     */
     private function renderOriginalNodeWithMutations(AstNode $node): string
     {
         $originalChildren = $node->originalChildren();
@@ -121,6 +133,9 @@ class SourcePreservingPrinter
         return $segments;
     }
 
+    /**
+     * Renders a mutated container node without original children.
+     */
     private function renderContainerWithoutOriginalChildren(AstNode $node): string
     {
         $source = $node->originalText();

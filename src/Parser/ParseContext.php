@@ -75,6 +75,9 @@ class ParseContext
 
     private readonly LakePlan $lakePlan;
 
+    /**
+     * Initializes a new ParseContext instance.
+     */
     public function __construct(
         private readonly Grammar $grammar,
         private readonly InputBuffer $input,

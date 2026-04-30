@@ -9,6 +9,9 @@ namespace EmanueleCoppola\PHPeg\Printer;
  */
 class PrintPolicy
 {
+    /**
+     * Initializes a new PrintPolicy instance.
+     */
     public function __construct(
         public readonly string $indent = '    ',
         public readonly string $newline = "\n",

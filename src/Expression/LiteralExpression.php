@@ -16,6 +16,9 @@ class LiteralExpression extends AbstractExpression
 
     private readonly string $description;
 
+    /**
+     * Initializes a new LiteralExpression instance.
+     */
     public function __construct(
         private readonly string $literal,
     ) {
@@ -31,6 +34,9 @@ class LiteralExpression extends AbstractExpression
         return $this->literal;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function match(ParseContext $context, int $offset): ?MatchResult
     {
         if (substr_compare($context->input()->text(), $this->literal, $offset, $this->length) !== 0) {
@@ -42,6 +48,9 @@ class LiteralExpression extends AbstractExpression
         return new MatchResult($offset, $offset + $this->length);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function describe(): string
     {
         return $this->description;
