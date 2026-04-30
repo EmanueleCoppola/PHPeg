@@ -6,11 +6,13 @@ namespace EmanueleCoppola\PHPeg\App\Commands;
 
 use EmanueleCoppola\PHPeg\App\Support\AstJsonExporter;
 use EmanueleCoppola\PHPeg\Document\ParsedDocument;
+use EmanueleCoppola\PHPeg\Error\GrammarSyntaxError;
 use EmanueleCoppola\PHPeg\Error\ParseError;
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
 use EmanueleCoppola\PHPeg\Loader\CleanPeg\CleanPegGrammarLoader;
 use EmanueleCoppola\PHPeg\Loader\Peg\PegGrammarLoader;
 use LaravelZero\Framework\Commands\Command;
+use InvalidArgumentException;
 use Throwable;
 
 /**
@@ -58,7 +60,7 @@ class ParseCommand extends Command
             $result = $grammar->parse($source, $startRule);
 
             if (!$result->isSuccess() || $result->node() === null) {
-                $this->outputFailure($grammarPath, $inputPath, $grammarFormat, $startRule, $result->error());
+                $this->renderParseFailure($grammarPath, $inputPath, $grammarFormat, $startRule, $result->error());
 
                 return self::FAILURE;
             }
@@ -81,7 +83,7 @@ class ParseCommand extends Command
 
             return self::SUCCESS;
         } catch (Throwable $throwable) {
-            $this->output->write($this->renderException($throwable) . PHP_EOL);
+            $this->renderCliError($throwable);
 
             return self::FAILURE;
         }
@@ -273,44 +275,86 @@ class ParseCommand extends Command
     }
 
     /**
-     * Renders a parse failure as JSON.
+     * Renders a parse failure as a clean CLI error.
      */
-    private function outputFailure(string $grammarPath, string $inputPath, string $grammarFormat, ?string $startRule, ?ParseError $error): void
+    private function renderParseFailure(string $grammarPath, string $inputPath, string $grammarFormat, ?string $startRule, ?ParseError $error): void
     {
-        $payload = [
-            'success' => false,
-            'grammar' => [
-                'path' => $grammarPath,
-                'format' => $grammarFormat,
-                'startRule' => $startRule,
-            ],
-            'input' => [
-                'path' => $inputPath,
-            ],
-            'error' => $error === null ? null : [
-                'message' => $error->message(),
-                'offset' => $error->offset(),
-                'line' => $error->line(),
-                'column' => $error->column(),
-                'expected' => $error->expected(),
-                'snippet' => $error->snippet(),
-            ],
-        ];
+        $this->error('ERROR');
+        $this->line($error?->message() ?? 'Unable to parse input.');
+        $this->line('');
+        $this->line('Context:');
+        $this->line(sprintf('  grammar: %s', $grammarPath));
+        $this->line(sprintf('  input: %s', $inputPath));
+        $this->line(sprintf('  format: %s', $grammarFormat));
 
-        $this->output->write(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) . PHP_EOL);
+        if ($startRule !== null) {
+            $this->line(sprintf('  start rule: %s', $startRule));
+        }
     }
 
     /**
-     * Renders a caught exception as JSON.
+     * Renders a caught exception using the CLI error style.
      */
-    private function renderException(Throwable $throwable): string
+    private function renderCliError(Throwable $throwable): void
     {
-        return json_encode([
-            'success' => false,
-            'error' => [
-                'message' => $throwable->getMessage(),
-                'type' => $throwable::class,
-            ],
-        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) ?: '{"success":false,"error":{"message":"Unable to render exception."}}';
+        $this->error('ERROR');
+        $this->line($this->friendlyErrorMessage($throwable));
+
+        $hint = $this->friendlyErrorHint($throwable);
+        if ($hint !== null) {
+            $this->line('');
+            $this->line('Hint: ' . $hint);
+        }
     }
+
+    /**
+     * Returns a human-readable message for the provided exception.
+     */
+    private function friendlyErrorMessage(Throwable $throwable): string
+    {
+        if ($throwable instanceof GrammarSyntaxError) {
+            return $throwable->getMessage();
+        }
+
+        if ($throwable instanceof InvalidArgumentException) {
+            return $throwable->getMessage();
+        }
+
+        return 'Unexpected error: ' . $throwable->getMessage();
+    }
+
+    /**
+     * Returns a short actionable hint for known exceptions.
+     */
+    private function friendlyErrorHint(Throwable $throwable): ?string
+    {
+        $message = $throwable->getMessage();
+
+        if (str_contains($message, 'Missing required grammar path.')) {
+            return 'Pass --grammar=path/to/file.cleanpeg and -i path/to/input.txt.';
+        }
+
+        if (str_contains($message, 'Missing required input path.')) {
+            return 'Pass -i path/to/input.txt or --input=path/to/input.txt.';
+        }
+
+        if (str_contains($message, 'Unable to infer grammar format')) {
+            return 'Use --grammar-format=cleanpeg or --grammar-format=peg.';
+        }
+
+        if (str_contains($message, 'Unsupported grammar format')) {
+            return 'Use --grammar-format=auto, cleanpeg, or peg.';
+        }
+
+        if (str_contains($message, 'Unsupported JSON style')) {
+            return 'Use --json-style=full or --json-style=simple.';
+        }
+
+        if ($throwable instanceof GrammarSyntaxError) {
+            return 'Check the grammar file syntax around the reported location.';
+        }
+
+        return null;
+    }
+
 }

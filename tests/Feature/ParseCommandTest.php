@@ -129,11 +129,58 @@ class ParseCommandTest extends TestCase
 
         self::assertSame(1, $exitCode);
         self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Missing required grammar path.', $stdout);
+    }
 
-        /** @var array<string, mixed> $payload */
-        $payload = json_decode($stdout, true, 512, JSON_THROW_ON_ERROR);
-        self::assertFalse($payload['success']);
-        self::assertStringContainsString('grammar', $payload['error']['message']);
+    /**
+     * Verifies invalid grammar format values render a clean CLI error.
+     */
+    public function testFailsWhenGrammarFormatIsInvalid(): void
+    {
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $this->projectRoot() . '/examples/nginx-config-edit/nginx-config-grammar.cleanpeg',
+            '--input=' . $this->projectRoot() . '/examples/nginx-config-edit/nginx-config.conf',
+            '--grammar-format=pippo',
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Unsupported grammar format "pippo".', $stdout);
+        self::assertStringContainsString('Use --grammar-format=auto, cleanpeg, or peg.', $stdout);
+    }
+
+    /**
+     * Verifies grammar syntax failures render a clean CLI error.
+     */
+    public function testFailsWhenGrammarCompilationFails(): void
+    {
+        $grammarPath = tempnam(sys_get_temp_dir(), 'phpeg-bad-grammar-');
+        if ($grammarPath === false) {
+            self::fail('Unable to create a temporary grammar file.');
+        }
+
+        file_put_contents($grammarPath, "Start = (\n");
+
+        [$exitCode, $stdout, $stderr] = $this->runCommand([
+            PHP_BINARY,
+            $this->projectRoot() . '/bin/phpeg',
+            'parse',
+            '--grammar=' . $grammarPath,
+            '--input=' . $this->projectRoot() . '/examples/nginx-config-edit/nginx-config.conf',
+            '--grammar-format=cleanpeg',
+        ]);
+
+        self::assertSame(1, $exitCode);
+        self::assertSame('', $stderr);
+        self::assertStringContainsString('ERROR', $stdout);
+        self::assertStringContainsString('Invalid CleanPeg syntax', $stdout);
+
+        @unlink($grammarPath);
     }
 
     /**

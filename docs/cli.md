@@ -198,7 +198,8 @@ php bin/phpeg parse \
 
 - `--start-rule` is available for grammars that support it.
 - The `simple` schema still keeps the tree recursive, so nested nodes remain queryable with `jq`.
-- Parse errors are reported as JSON with the error message and location.
+- Parse and CLI errors are rendered as clean console errors, not JSON.
+- Missing required CLI flags and invalid grammar settings are shown with a short `ERROR` banner and a hint when possible.
 
 ## Related Docs
 
