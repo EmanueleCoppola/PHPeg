@@ -1,79 +1,207 @@
 # CLI
 
-PHPPeg includes a command-line parser that loads a grammar file, parses an input file, optionally filters the AST with a selector, and exports JSON.
+PHPPeg ships with a command-line parser for parsing files with `.peg` or `.cleanpeg` grammars.
 
-## Command
+The CLI can:
 
-Recommended form:
+- load a grammar file
+- parse an input file
+- export the AST as JSON
+- filter exported AST nodes with a selector
+- optionally export the parse tree as Graphviz DOT
+
+## Basic Usage
+
+Parse an input file with a grammar:
 
 ```bash
-php bin/phpeg parse --grammar=path/to/grammar.cleanpeg -i path/to/input.txt --query='Block[name="server"]' --json-style=simple -o output.json
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt
 ```
 
-## Required Input
+By default, the command writes JSON to stdout:
 
-The command needs two required paths:
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt > result.json
+```
 
-- `--grammar=PATH`
-  - the grammar file to load
-  - it can be a `.peg` or `.cleanpeg` file
-  - may be relative or absolute
-  - relative paths are resolved from the current working directory
-- `-i, --input=PATH`
-  - the input file to parse
-  - may be relative or absolute
-  - the short `-i` form is convenient in shell pipelines
+You can also write JSON directly to a file:
 
-If either flag is missing, the command returns a failure response.
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt --output=result.json
+```
 
-## Grammar Format
-
-`--grammar-format` accepts:
-
-- `auto`
-- `cleanpeg`
-- `peg`
-
-`auto` is the default. It infers the format from the grammar file extension:
-
-- `.cleanpeg` resolves to `cleanpeg`
-- `.peg` resolves to `peg`
-
-If you set `--grammar-format=auto`, the command detects the format automatically from `--grammar`.
-
-If you use `cleanpeg` or `peg` explicitly, the grammar format is forced and no inference is applied.
-
-## Query
-
-`--query=SELECTOR` filters the exported nodes using the same selector syntax as `ParsedDocument::query()`.
-
-Examples:
-
-- `Block[name="server"]`
-- `Lake[kind="lake"]`
-- `Block > Directive:first`
-
-If `--query` is omitted, the command exports the parsed root node.
-
-## Output
-
-The command writes JSON to stdout by default.
-
-If you pass `-o` or `--output`, the JSON is written to that path instead.
-
-The output path can use any extension you want, for example:
+The short `-i` and `-o` aliases are also available:
 
 ```bash
 php bin/phpeg parse --grammar=grammar.cleanpeg -i input.txt -o result.json
 ```
 
-The file still contains JSON. The extension is only a filename choice, not a format restriction.
+## Common Examples
 
-## Output Styles
+### Parse with a selector
+
+```bash
+php bin/phpeg parse \
+  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
+  --input=examples/nginx-config-edit/nginx-config.conf \
+  --query='Block[name="server"]'
+```
+
+### Export compact JSON
+
+```bash
+php bin/phpeg parse \
+  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
+  --input=examples/nginx-config-edit/nginx-config.conf \
+  --query='Block[name="server"]' \
+  --json-style=simple
+```
+
+### Write JSON to a file
+
+```bash
+php bin/phpeg parse \
+  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
+  --input=examples/nginx-config-edit/nginx-config.conf \
+  --query='Block[name="server"]' \
+  --json-style=simple \
+  --output=server-node.json
+```
+
+### Pipe into `jq`
+
+```bash
+php bin/phpeg parse \
+  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
+  --input=examples/nginx-config-edit/nginx-config.conf \
+  --query='Block[name="server"]' \
+  --json-style=simple \
+  | jq '.matches[0] | {name, text, lake}'
+```
+
+### Export a parse tree as DOT
+
+```bash
+php bin/phpeg parse \
+  --grammar=path/to/grammar.cleanpeg \
+  --input=path/to/input.txt \
+  --tree-format=dot \
+  --tree-output=debug/output-tree.dot
+```
+
+Render the DOT file with Graphviz:
+
+```bash
+dot -Tsvg debug/output-tree.dot -o debug/output-tree.svg
+```
+
+## Options
+
+| Option | Required | Default | Description |
+|---|---:|---|---|
+| `--grammar=PATH` | Yes | - | Grammar file to load. Supports `.peg` and `.cleanpeg`. |
+| `-i, --input=PATH` | Yes | - | Input file to parse. |
+| `--grammar-format=FORMAT` | No | `auto` | Grammar format. One of `auto`, `cleanpeg`, `peg`. |
+| `--start-rule=RULE` | No | grammar default | Start rule used for parsing. |
+| `--query=SELECTOR` | No | root node | Filters exported AST nodes using the selector syntax. |
+| `--json-style=STYLE` | No | `full` | JSON output style. One of `full`, `simple`. |
+| `-o, --output=PATH` | No | stdout | Writes JSON output to a file. |
+| `--tree-format=FORMAT` | No | - | Parse tree export format. Currently only `dot` is supported. |
+| `--tree-output=PATH` | Required with `--tree-format` | - | Path where the parse tree DOT file is written. |
+
+## Required Input
+
+The command requires two paths:
+
+- `--grammar=PATH`
+- `-i, --input=PATH`
+
+Both paths may be relative or absolute.
+
+Relative paths are resolved from the current working directory.
+
+If either flag is missing, the command fails with a CLI error.
+
+## Grammar Format
+
+By default, PHPPeg detects the grammar format from the grammar file extension.
+
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt
+```
+
+`--grammar-format=auto` resolves formats as follows:
+
+| Extension | Format |
+|---|---|
+| `.cleanpeg` | `cleanpeg` |
+| `.peg` | `peg` |
+
+You can force a grammar format explicitly:
+
+```bash
+php bin/phpeg parse \
+  --grammar=grammar.txt \
+  --grammar-format=cleanpeg \
+  --input=input.txt
+```
+
+When `cleanpeg` or `peg` is provided explicitly, file extension inference is skipped.
+
+## Querying the AST
+
+`--query=SELECTOR` filters the exported AST nodes using the same selector syntax as `ParsedDocument::query()`.
+
+Examples:
+
+```bash
+--query='Block[name="server"]'
+--query='Lake[kind="lake"]'
+--query='Block > Directive:first'
+```
+
+If `--query` is omitted, the parsed root node is exported.
+
+See [AST query](query.md) for the full selector syntax.
+
+## JSON Output
+
+The CLI writes JSON to stdout by default.
+
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt
+```
+
+Use `--output` or `-o` to write JSON to a file:
+
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt --output=result.json
+```
+
+The output file extension does not affect the format. The file always contains JSON.
+
+For example, all of these commands still write JSON:
+
+```bash
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt --output=result.json
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt --output=result.txt
+php bin/phpeg parse --grammar=grammar.cleanpeg --input=input.txt --output=result.dump
+```
+
+## JSON Styles
+
+PHPPeg supports two JSON output styles:
+
+| Style | Description |
+|---|---|
+| `full` | Detailed output with metadata, offsets, state flags, attributes, semantic fields, and children. |
+| `simple` | Compact recursive tree with only `name`, `text`, `lake`, and `children`. |
 
 ### `full`
 
-`full` is the detailed schema. It includes:
+`full` is the detailed schema and is useful when you need complete parse information.
+
+It includes:
 
 - grammar metadata
 - input metadata
@@ -132,14 +260,16 @@ Each node contains:
 
 ### `simple`
 
-`simple` is the compact schema. It keeps only:
+`simple` is a compact schema intended for quick inspection, shell pipelines, and `jq`.
+
+It keeps only:
 
 - `name`
 - `text`
 - `lake`
 - recursive `children`
 
-This is the best choice when you want to pipe the output into `jq` and inspect only the fields you need.
+Even in `simple` mode, the tree remains recursive, so nested nodes can still be inspected with tools like `jq`.
 
 <details>
 <summary>Example JSON</summary>
@@ -160,46 +290,85 @@ This is the best choice when you want to pipe the output into `jq` and inspect o
 
 </details>
 
-## Example Workflows
+## Parse Tree Export
 
-### Print to stdout
+The parse tree export is separate from JSON output.
 
-```bash
-php bin/phpeg parse \
-  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
-  -i examples/nginx-config-edit/nginx-config.conf \
-  --query='Block[name="server"]' \
-  --json-style=full
-```
+JSON output represents exported AST nodes.
 
-### Write to a file
+DOT export is mainly useful for debugging the parse tree structure.
+
+To export a parse tree:
 
 ```bash
 php bin/phpeg parse \
-  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
-  -i examples/nginx-config-edit/nginx-config.conf \
-  --query='Block[name="server"]' \
-  --json-style=simple \
-  -o server-node.json
+  --grammar=grammar.cleanpeg \
+  --input=input.txt \
+  --tree-format=dot \
+  --tree-output=debug/tree.dot
 ```
 
-### Pipe into `jq`
+Currently, `dot` is the only supported tree format.
+
+If any other value is passed to `--tree-format`, the command fails with a CLI error.
+
+### JSON output and tree output together
+
+`--output` and `--tree-output` are independent.
+
+Use `--output` for the JSON AST export:
+
+```bash
+--output=result.json
+```
+
+Use `--tree-output` for the DOT parse tree export:
+
+```bash
+--tree-output=debug/tree.dot
+```
+
+Example:
 
 ```bash
 php bin/phpeg parse \
-  --grammar=examples/nginx-config-edit/nginx-config-grammar.cleanpeg \
-  -i examples/nginx-config-edit/nginx-config.conf \
-  --query='Block[name="server"]' \
-  --json-style=simple \
-  | jq '.matches[0] | {name, text, lake}'
+  --grammar=grammar.cleanpeg \
+  --input=input.txt \
+  --json-style=full \
+  --output=result.json \
+  --tree-format=dot \
+  --tree-output=debug/tree.dot
 ```
+
+This writes:
+
+- JSON AST output to `result.json`
+- parse tree DOT output to `debug/tree.dot`
+
+## Errors
+
+Parse and CLI errors are rendered as clean console errors, not JSON.
+
+The command returns a failure response when:
+
+- `--grammar` is missing
+- `--input` is missing
+- the grammar file cannot be loaded
+- the input file cannot be read
+- the grammar format is invalid
+- the parse fails
+- an unsupported tree format is requested
+- `--tree-format` is provided without a valid `--tree-output`
+
+Missing required flags and invalid grammar settings are shown with a short `ERROR` banner and a hint when possible.
 
 ## Notes
 
 - `--start-rule` is available for grammars that support it.
-- The `simple` schema still keeps the tree recursive, so nested nodes remain queryable with `jq`.
-- Parse and CLI errors are rendered as clean console errors, not JSON.
-- Missing required CLI flags and invalid grammar settings are shown with a short `ERROR` banner and a hint when possible.
+- `simple` JSON is best for shell usage, `jq`, and quick inspection.
+- `full` JSON is best for debugging, tooling, and integrations that need offsets or metadata.
+- Parse tree export is intended for debugging parser structure, not for source-preserving AST editing.
+- The CLI does not infer JSON format from the output file extension.
 
 ## Related Docs
 
