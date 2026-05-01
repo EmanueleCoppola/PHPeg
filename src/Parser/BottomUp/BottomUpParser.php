@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace EmanueleCoppola\PHPeg\Parser;
+namespace EmanueleCoppola\PHPeg\Parser\BottomUp;
 
 use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
 use EmanueleCoppola\PHPeg\Error\ParseError;
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
 use EmanueleCoppola\PHPeg\Lake\LakeAnalysisException;
 use EmanueleCoppola\PHPeg\Parser\InputBuffer;
-use EmanueleCoppola\PHPeg\Parser\ParseContext;
+use EmanueleCoppola\PHPeg\Parser\ParserOptions;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
 use EmanueleCoppola\PHPeg\Result\ParseResult;
 
@@ -43,7 +43,7 @@ class BottomUpParser
         $inputBuffer = new InputBuffer($input);
 
         try {
-            $context = new ParseContext($grammar, $inputBuffer, $options ?? $this->options, true);
+            $context = new BottomUpParseContext($grammar, $inputBuffer, $options ?? $this->options);
             $result = $context->matchRule($ruleName, 0);
         } catch (LakeAnalysisException $exception) {
             return ParseResult::failure(
@@ -73,7 +73,7 @@ class BottomUpParser
     /**
      * Converts the low-level match result into a public parse result.
      */
-    private function finalizeParse(ParseContext $context, InputBuffer $inputBuffer, ?MatchResult $result): ParseResult
+    private function finalizeParse(BottomUpParseContext $context, InputBuffer $inputBuffer, ?MatchResult $result): ParseResult
     {
         if ($result === null || $result->endOffset() !== $inputBuffer->length()) {
             return ParseResult::failure(

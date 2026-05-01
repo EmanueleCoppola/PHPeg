@@ -6,6 +6,7 @@ namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
 use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
 use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Parser\Packrat\PackratParseContext;
 use EmanueleCoppola\PHPeg\Parser\ParseContext;
 use EmanueleCoppola\PHPeg\Parser\ParserOptions;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
@@ -23,6 +24,7 @@ class ParseContextTest extends TestCase
         $first = $context->matchRule('Start', 0);
         $second = $context->matchRule('Start', 0);
 
+        self::assertInstanceOf(PackratParseContext::class, $context);
         self::assertSame($grammar, $context->grammar());
         self::assertSame('a', $context->input()->text());
         self::assertSame($first, $second);

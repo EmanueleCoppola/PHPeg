@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\Parser;
 
 use EmanueleCoppola\PHPeg\Error\ParseError;
-use EmanueleCoppola\PHPeg\Error\LeftRecursionException;
 use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
 use EmanueleCoppola\PHPeg\Expression\LakeExpression;
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
@@ -16,74 +15,92 @@ use EmanueleCoppola\PHPeg\Lake\LakePlanCache;
 use EmanueleCoppola\PHPeg\Result\MatchResult;
 
 /**
- * Holds parser state, memoization, and failure diagnostics.
+ * Holds parser state, memoization, and failure diagnostics shared by parser runtimes.
  */
-class ParseContext
+abstract class ParseContext
 {
     /**
      * @var array<string, array<int, RuleMemoEntry>>
      */
-    private array $memo = [];
+    protected array $memo = [];
 
     /**
      * @var list<array{rule:string,offset:int}>
      */
-    private array $memoOrder = [];
+    protected array $memoOrder = [];
 
-    private int $furthestOffset = 0;
+    /**
+     * @var int
+     */
+    protected int $furthestOffset = 0;
 
     /**
      * @var array<string, true>
      */
-    private array $expected = [];
+    protected array $expected = [];
 
-    private ?string $optimizedExpected = null;
+    /**
+     * @var ?string
+     */
+    protected ?string $optimizedExpected = null;
 
     /**
      * @var array<int, MatchResult>
      */
-    private array $emptyMatches = [];
+    protected array $emptyMatches = [];
 
     /**
      * @var array<string, MatchResult|null>
      */
-    private array $expressionMemo = [];
+    protected array $expressionMemo = [];
 
     /**
      * @var list<string>
      */
-    private array $expressionMemoOrder = [];
-
-    private int $failureSuppressionDepth = 0;
+    protected array $expressionMemoOrder = [];
 
     /**
-     * @var int Tracks whether the parser is rescanning a left-recursive rule.
+     * @var int
      */
-    private int $leftRecursionRescanningDepth = 0;
+    protected int $failureSuppressionDepth = 0;
 
     /**
      * @var list<array<int, int>>
      */
-    private array $bannedLakeIdStack = [];
+    protected array $bannedLakeIdStack = [];
 
-    private readonly bool $memoizationEnabled;
+    /**
+     * @var bool
+     */
+    protected readonly bool $memoizationEnabled;
 
-    private readonly bool $optimizeErrors;
+    /**
+     * @var bool
+     */
+    protected readonly bool $optimizeErrors;
 
-    private readonly bool $reuseEmptyMatches;
+    /**
+     * @var bool
+     */
+    protected readonly bool $reuseEmptyMatches;
 
-    private readonly ?int $maxCacheEntries;
+    /**
+     * @var ?int
+     */
+    protected readonly ?int $maxCacheEntries;
 
-    private readonly LakePlan $lakePlan;
+    /**
+     * @var LakePlan
+     */
+    protected readonly LakePlan $lakePlan;
 
     /**
      * Initializes a new ParseContext instance.
      */
     public function __construct(
-        private readonly Grammar $grammar,
-        private readonly InputBuffer $input,
-        private readonly ParserOptions $options = new ParserOptions(),
-        private readonly bool $leftRecursionEnabled = false,
+        protected readonly Grammar $grammar,
+        protected readonly InputBuffer $input,
+        protected readonly ParserOptions $options = new ParserOptions(),
     ) {
         $this->memoizationEnabled = $options->memoizationEnabled();
         $this->optimizeErrors = $options->optimizeErrors();
@@ -171,60 +188,7 @@ class ParseContext
     /**
      * Matches a named rule with memoization.
      */
-    public function matchRule(string $ruleName, int $offset): ?MatchResult
-    {
-        $rule = $this->grammar->rule($ruleName);
-        if ($rule === null) {
-            $this->recordFailure($offset, sprintf('rule <%s>', $ruleName));
-
-            return null;
-        }
-
-        $entry = $this->memo[$ruleName][$offset] ?? null;
-        if ($entry instanceof RuleMemoEntry) {
-            if ($entry->isEvaluating()) {
-                if (!$this->leftRecursionEnabled) {
-                    throw new LeftRecursionException($ruleName, $offset);
-                }
-
-                $entry->markLeftRecursive();
-
-                return $entry->result();
-            }
-
-            if ($this->leftRecursionRescanningDepth === 0) {
-                return $entry->result();
-            }
-        }
-
-        $entry = new RuleMemoEntry();
-        $this->memo[$ruleName][$offset] = $entry;
-
-        try {
-            $entry->beginEvaluation();
-            $result = $rule->match($this, $offset);
-        } finally {
-            $entry->finishEvaluation();
-        }
-
-        $entry->setResult($result);
-
-        if ($this->leftRecursionEnabled && $entry->hasLeftRecursion() && $result !== null) {
-            $result = $this->growLeftRecursiveRule($ruleName, $rule, $offset, $entry, $result);
-            $entry->setResult($result);
-        }
-
-        if ($this->memoizationEnabled || $this->leftRecursionEnabled) {
-            $this->rememberRuleResult($ruleName, $offset, $entry);
-        } else {
-            unset($this->memo[$ruleName][$offset]);
-            if ($this->memo[$ruleName] === []) {
-                unset($this->memo[$ruleName]);
-            }
-        }
-
-        return $result;
-    }
+    abstract public function matchRule(string $ruleName, int $offset): ?MatchResult;
 
     /**
      * Matches a named rule without recording failures.
@@ -311,7 +275,10 @@ class ParseContext
     /**
      * Stores a memoized rule entry and applies the configured cache limit.
      */
-    private function rememberRuleResult(string $ruleName, int $offset, RuleMemoEntry $entry): void
+    /**
+     * Stores a memoized rule entry and applies the configured cache limit.
+     */
+    protected function rememberRuleResult(string $ruleName, int $offset, RuleMemoEntry $entry): void
     {
         $this->memo[$ruleName][$offset] = $entry;
 
@@ -335,54 +302,9 @@ class ParseContext
     }
 
     /**
-     * Resets the caches before rescanning a left-recursive rule.
-     */
-    private function resetCachesForLeftRecursion(string $ruleName, int $offset, RuleMemoEntry $entry): void
-    {
-        $this->memo = [];
-        $this->memoOrder = [];
-        $this->expressionMemo = [];
-        $this->expressionMemoOrder = [];
-        $this->memo[$ruleName][$offset] = $entry;
-    }
-
-    /**
-     * Re-evaluates a left-recursive rule until the match stops growing.
-     */
-    private function growLeftRecursiveRule(string $ruleName, Rule $rule, int $offset, RuleMemoEntry $entry, MatchResult $result): MatchResult
-    {
-        $bestResult = $result;
-
-        while (true) {
-            $this->resetCachesForLeftRecursion($ruleName, $offset, $entry);
-            $entry->setResult($bestResult);
-            $entry->beginEvaluation();
-            $this->leftRecursionRescanningDepth++;
-
-            try {
-                $grownResult = $rule->match($this, $offset);
-            } finally {
-                $this->leftRecursionRescanningDepth--;
-                $entry->finishEvaluation();
-            }
-
-            if ($grownResult !== null && $grownResult->endOffset() > $bestResult->endOffset()) {
-                $bestResult = $grownResult;
-                $entry->setResult($bestResult);
-
-                continue;
-            }
-
-            break;
-        }
-
-        return $bestResult;
-    }
-
-    /**
      * Applies the configured expression memoization limit.
      */
-    private function trimExpressionMemo(): void
+    protected function trimExpressionMemo(): void
     {
         if ($this->maxCacheEntries === null) {
             return;
@@ -401,10 +323,10 @@ class ParseContext
     /**
      * Matches an expression with memoization and lake-ban awareness.
      */
-    private function matchExpressionInternal(ExpressionInterface $expression, int $offset): ?MatchResult
+    protected function matchExpressionInternal(ExpressionInterface $expression, int $offset): ?MatchResult
     {
         $cacheKey = null;
-        if ($this->memoizationEnabled && $this->leftRecursionRescanningDepth === 0) {
+        if ($this->memoizationEnabled && !$this->isRescanningLeftRecursiveRule()) {
             $cacheKey = $this->expressionMemoKey($expression, $offset);
             if (array_key_exists($cacheKey, $this->expressionMemo)) {
                 return $this->expressionMemo[$cacheKey];
@@ -421,7 +343,7 @@ class ParseContext
             return null;
         }
 
-        if ($this->leftRecursionRescanningDepth > 0) {
+        if ($this->isRescanningLeftRecursiveRule()) {
             return $this->matchExpressionDirect($expression, $offset);
         }
 
@@ -440,7 +362,7 @@ class ParseContext
     /**
      * Matches an expression without consulting the memoized cache.
      */
-    private function matchExpressionDirect(ExpressionInterface $expression, int $offset): ?MatchResult
+    protected function matchExpressionDirect(ExpressionInterface $expression, int $offset): ?MatchResult
     {
         return $expression->match($this, $offset);
     }
@@ -448,7 +370,7 @@ class ParseContext
     /**
      * Returns whether the current stop-match context bans the provided lake.
      */
-    private function isLakeBanned(LakeExpression $lake, int $offset): bool
+    protected function isLakeBanned(LakeExpression $lake, int $offset): bool
     {
         $lakeId = spl_object_id($lake);
 
@@ -464,7 +386,7 @@ class ParseContext
     /**
      * Builds a memoization key that includes the active lake-ban signature.
      */
-    private function expressionMemoKey(ExpressionInterface $expression, int $offset): string
+    protected function expressionMemoKey(ExpressionInterface $expression, int $offset): string
     {
         return $this->bannedLakeSignature() . '|' . spl_object_id($expression) . '|' . $offset;
     }
@@ -472,7 +394,7 @@ class ParseContext
     /**
      * Returns a stable signature for the currently banned lake ids.
      */
-    private function bannedLakeSignature(): string
+    protected function bannedLakeSignature(): string
     {
         if ($this->bannedLakeIdStack === []) {
             return '0';
@@ -489,5 +411,13 @@ class ParseContext
         sort($keys);
 
         return implode(',', $keys);
+    }
+
+    /**
+     * Returns whether the parser is rescanning a left-recursive rule.
+     */
+    protected function isRescanningLeftRecursiveRule(): bool
+    {
+        return false;
     }
 }

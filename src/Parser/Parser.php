@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\Parser;
 
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use EmanueleCoppola\PHPeg\Parser\BottomUp\BottomUpParser;
+use EmanueleCoppola\PHPeg\Parser\Packrat\PackratParser;
 use EmanueleCoppola\PHPeg\Result\ParseResult;
 
 /**
