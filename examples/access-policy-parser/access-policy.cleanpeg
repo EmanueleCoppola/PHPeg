@@ -1,0 +1,26 @@
+PolicyFile = PolicyRule* EOF
+PolicyRule = Effect "if" Expr
+Effect = "allow" / "deny"
+
+Expr = Expr "or" AndExpr / AndExpr
+AndExpr = AndExpr "and" NotExpr / NotExpr
+NotExpr = "not" NotExpr / Comparison
+Comparison = AddExpr (CompOp AddExpr)?
+CompOp = "==" / "!=" / "<=" / ">=" / "<" / ">" / "in"
+
+AddExpr = AddExpr ("+" / "-") MulExpr / MulExpr
+MulExpr = MulExpr ("*" / "/") Unary / Unary
+Unary = ("+" / "-") Unary / Primary
+Primary = Boolean / Number / String / Access / "(" Expr ")" / Array
+
+Access = Identifier AccessTail*
+AccessTail = MemberAccess / CallArgs / IndexAccess
+MemberAccess = "." Identifier
+CallArgs = "(" (Expr ("," Expr)*)? ")"
+IndexAccess = "[" Expr "]"
+Array = "[" (Expr ("," Expr)*)? "]"
+
+Boolean = "true" / "false"
+Number = r'[0-9]+(?:\.[0-9]+)?'
+String = r'"(?:\\.|[^"])*"'
+Identifier = r'[A-Za-z_][A-Za-z0-9_]*'

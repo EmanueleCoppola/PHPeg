@@ -1,0 +1,3 @@
+allow if user.role == "admin" or (user.department == "sales" and not request.archived)
+allow if isMemberOf(user.id, resource.team) or resource.ownerId == user.id
+deny if resource.classification == "secret" and not user.mfaEnabled
