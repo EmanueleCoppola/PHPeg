@@ -27,6 +27,5 @@ class GrammarTest extends TestCase
         self::assertNull($grammar->rule('Missing'));
         self::assertSame('ab', $grammar->parse('ab')->matchedText());
         self::assertSame('ab', $grammar->parseDocument('ab')->source());
-        self::assertSame('ab', $grammar->contextFor('ab')->input()->text());
     }
 }

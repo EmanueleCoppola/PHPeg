@@ -6,6 +6,7 @@ namespace EmanueleCoppola\PHPeg\Tests\Parser;
 
 use EmanueleCoppola\PHPeg\Builder\GrammarBuilder;
 use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
+use EmanueleCoppola\PHPeg\Parser\InputBuffer;
 use EmanueleCoppola\PHPeg\Parser\Packrat\PackratParseContext;
 use EmanueleCoppola\PHPeg\Parser\ParseContext;
 use EmanueleCoppola\PHPeg\Parser\ParserOptions;
@@ -20,11 +21,9 @@ class ParseContextTest extends TestCase
     public function testMatchesRulesAndMemoizesResults(): void
     {
         $grammar = $this->memoizationGrammar();
-        $context = $grammar->contextFor('a');
+        $context = new PackratParseContext($grammar, new InputBuffer('a'));
         $first = $context->matchRule('Start', 0);
         $second = $context->matchRule('Start', 0);
-
-        self::assertInstanceOf(PackratParseContext::class, $context);
         self::assertSame($grammar, $context->grammar());
         self::assertSame('a', $context->input()->text());
         self::assertSame($first, $second);
@@ -40,7 +39,7 @@ class ParseContextTest extends TestCase
             ->grammar('Start')
             ->rule('Start', $builder->literal('a'))
             ->build();
-        $context = $grammar->contextFor('b');
+        $context = new PackratParseContext($grammar, new InputBuffer('b'));
 
         self::assertNull($context->matchRule('Missing', 0));
         self::assertStringContainsString('rule <Missing>', $context->error()->message());
@@ -56,7 +55,7 @@ class ParseContextTest extends TestCase
             ->grammar('Start')
             ->rule('Start', $expression)
             ->build();
-        $context = $grammar->contextFor('a', new ParserOptions(memoizationEnabled: false));
+        $context = new PackratParseContext($grammar, new InputBuffer('a'), new ParserOptions(memoizationEnabled: false));
 
         $context->matchRule('Start', 0);
         $context->matchRule('Start', 0);
@@ -74,7 +73,7 @@ class ParseContextTest extends TestCase
             ->grammar('Start')
             ->rule('Start', $expression)
             ->build();
-        $context = $grammar->contextFor('a', new ParserOptions(maxCacheEntries: 1));
+        $context = new PackratParseContext($grammar, new InputBuffer('a'), new ParserOptions(maxCacheEntries: 1));
 
         $context->matchRule('Start', 0);
         $context->matchRule('Start', 1);

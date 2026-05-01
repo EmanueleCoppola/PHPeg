@@ -7,8 +7,6 @@ namespace EmanueleCoppola\PHPeg\Grammar;
 use RuntimeException;
 use EmanueleCoppola\PHPeg\Document\ParsedDocument;
 use EmanueleCoppola\PHPeg\Expression\ExpressionInterface;
-use EmanueleCoppola\PHPeg\Parser\Packrat\PackratParseContext;
-use EmanueleCoppola\PHPeg\Parser\InputBuffer;
 use EmanueleCoppola\PHPeg\Parser\Parser;
 use EmanueleCoppola\PHPeg\Parser\ParserOptions;
 use EmanueleCoppola\PHPeg\Result\ParseResult;
@@ -124,11 +122,4 @@ class Grammar
         return new ParsedDocument($this, $input, $result->node());
     }
 
-    /**
-     * Creates a parse context for this grammar and input text.
-     */
-    public function contextFor(string $input, ?ParserOptions $options = null): PackratParseContext
-    {
-        return new PackratParseContext($this, new InputBuffer($input), $options ?? new ParserOptions());
-    }
 }
