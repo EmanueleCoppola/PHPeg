@@ -54,7 +54,7 @@ class RecursiveGrammarTest extends TestCase
         self::assertSame('deeper', trim((string) $deeperBlock?->firstChild('Identifier')?->text()));
     }
 
-    public function testParserDetectsDirectLeftRecursionAndReturnsClearError(): void
+    public function testGrammarMarksDirectLeftRecursionAsRequired(): void
     {
         $g = GrammarBuilder::create();
         $grammar = $g->grammar('Expr')
@@ -67,8 +67,29 @@ class RecursiveGrammarTest extends TestCase
 
         $result = $grammar->parse('1+2');
 
-        self::assertFalse($result->isSuccess());
-        self::assertStringContainsString('Left-recursive rule detected: Expr', $result->error()?->message() ?? '');
+        self::assertTrue($grammar->requiresLeftRecursion());
+        self::assertTrue($result->isSuccess());
+        self::assertSame('Expr', $result->node()?->name());
+    }
+
+    public function testParserCanResolveDirectLeftRecursionAutomatically(): void
+    {
+        $g = GrammarBuilder::create();
+        $grammar = $g->grammar('Expr')
+            ->rule('Expr', $g->choice(
+                $g->seq($g->ref('Expr'), $g->literal('+'), $g->ref('Number')),
+                $g->ref('Number'),
+            ))
+            ->rule('Number', $g->oneOrMore($g->charClass('[0-9]')))
+            ->build();
+
+        $result = $grammar->parse('1+2+3');
+
+        self::assertTrue($grammar->requiresLeftRecursion());
+        self::assertTrue($result->isSuccess());
+        self::assertSame('Expr', $result->node()?->name());
+        self::assertSame('1+2+3', $result->matchedText());
+        self::assertSame(5, $result->finalOffset());
     }
 
     public function testRecursiveParseFailureRestoresInputPositionCorrectly(): void

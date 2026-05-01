@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace EmanueleCoppola\PHPeg\Lake;
 
 use EmanueleCoppola\PHPeg\Grammar\Grammar;
+use WeakMap;
 
 /**
  * Caches compiled lake plans per immutable grammar instance.
@@ -12,23 +13,30 @@ use EmanueleCoppola\PHPeg\Grammar\Grammar;
 class LakePlanCache
 {
     /**
-     * @var array<int, LakePlan>
+     * @var WeakMap<Grammar, LakePlan>|null
      */
-    private static array $cache = [];
+    private static ?WeakMap $cache = null;
 
     /**
      * Returns the cached lake plan for the provided grammar, compiling it on demand.
      */
     public static function forGrammar(Grammar $grammar): LakePlan
     {
-        $grammarId = spl_object_id($grammar);
+        $cache = self::$cache;
+        if ($cache === null) {
+            $cache = new WeakMap();
+            self::$cache = $cache;
+        }
 
-        if (isset(self::$cache[$grammarId])) {
-            return self::$cache[$grammarId];
+        if ($cache->offsetExists($grammar)) {
+            /** @var LakePlan $plan */
+            $plan = $cache->offsetGet($grammar);
+
+            return $plan;
         }
 
         $plan = LakeAnalyzer::analyze($grammar);
-        self::$cache[$grammarId] = $plan;
+        $cache->offsetSet($grammar, $plan);
 
         return $plan;
     }

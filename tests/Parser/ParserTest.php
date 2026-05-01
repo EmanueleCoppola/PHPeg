@@ -25,14 +25,16 @@ class ParserTest extends TestCase
     }
 
     /**
-     * Rejects left-recursive grammars with a clear error.
+     * Parses left-recursive grammars by switching to the bottom-up path automatically.
      */
-    public function testReportsLeftRecursion(): void
+    public function testAutoDetectsAndParsesLeftRecursion(): void
     {
-        $result = $this->leftRecursiveGrammar()->parse('a');
+        $grammar = $this->leftRecursiveGrammar();
+        $result = $grammar->parse('aaa');
 
-        self::assertFalse($result->isSuccess());
-        self::assertStringContainsString('Left-recursive rule detected', $result->error()?->message() ?? '');
+        self::assertTrue($grammar->requiresLeftRecursion());
+        self::assertTrue($result->isSuccess());
+        self::assertSame('aaa', $result->matchedText());
     }
 
     /**
@@ -75,7 +77,10 @@ class ParserTest extends TestCase
 
         return $builder
             ->grammar('Start')
-            ->rule('Start', $builder->ref('Start'))
+            ->rule('Start', $builder->choice(
+                $builder->seq($builder->ref('Start'), $builder->literal('a')),
+                $builder->literal('a'),
+            ))
             ->build();
     }
 }

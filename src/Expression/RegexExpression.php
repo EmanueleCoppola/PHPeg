@@ -17,6 +17,8 @@ class RegexExpression extends AbstractExpression
 
     private readonly string $description;
 
+    private readonly bool $canMatchEmpty;
+
     /**
      * Initializes a new RegexExpression instance.
      */
@@ -34,6 +36,7 @@ class RegexExpression extends AbstractExpression
 
         $this->regex = $regex;
         $this->description = sprintf('regex(%s)', $pattern);
+        $this->canMatchEmpty = preg_match($this->regex, '') === 1;
     }
 
     /**
@@ -42,6 +45,14 @@ class RegexExpression extends AbstractExpression
     public function pattern(): string
     {
         return $this->pattern;
+    }
+
+    /**
+     * Returns whether the regex can match the empty string.
+     */
+    public function canMatchEmpty(): bool
+    {
+        return $this->canMatchEmpty;
     }
 
     /**

@@ -30,6 +30,11 @@ class Grammar
     }
 
     /**
+     * @var ?bool
+     */
+    private ?bool $leftRecursionRequired = null;
+
+    /**
      * Returns the configured start rule name.
      */
     public function startRule(): string
@@ -82,6 +87,18 @@ class Grammar
     public function lakeProfiles(): array
     {
         return $this->lakeProfiles;
+    }
+
+    /**
+     * Returns whether the grammar requires left-recursive parsing support.
+     */
+    public function requiresLeftRecursion(): bool
+    {
+        if ($this->leftRecursionRequired === null) {
+            $this->leftRecursionRequired = LeftRecursionAnalyzer::detect($this);
+        }
+
+        return $this->leftRecursionRequired;
     }
 
     /**
